@@ -1,7 +1,8 @@
-import { z } from 'zod';
-import { Request, Response, NextFunction } from 'express';
-import { TRPCError } from '@trpc/server';
-import crypto from 'crypto';
+import { z } from "zod";
+import { Request, Response, NextFunction } from "express";
+import { TRPCError } from "@trpc/server";
+import crypto from "crypto";
+import Redis from "ioredis";
 
 /**
  * Authentication Patterns
@@ -10,12 +11,12 @@ import crypto from 'crypto';
 
 // Token types
 export const TokenTypeSchema = z.enum([
-  'access',
-  'refresh',
-  'api_key',
-  'verification',
-  'password_reset',
-  'invitation',
+  "access",
+  "refresh",
+  "api_key",
+  "verification",
+  "password_reset",
+  "invitation",
 ]);
 
 export type TokenType = z.infer<typeof TokenTypeSchema>;
@@ -80,8 +81,8 @@ export const passwordUtils = {
    * Hash a password with salt
    */
   async hash(password: string): Promise<string> {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+    const salt = crypto.randomBytes(16).toString("hex");
+    const hash = crypto.scryptSync(password, salt, 64).toString("hex");
     return `${salt}:${hash}`;
   },
 
@@ -89,8 +90,8 @@ export const passwordUtils = {
    * Verify password against hash
    */
   async verify(password: string, storedHash: string): Promise<boolean> {
-    const [salt, hash] = storedHash.split(':');
-    const newHash = crypto.scryptSync(password, salt, 64).toString('hex');
+    const [salt, hash] = storedHash.split(":");
+    const newHash = crypto.scryptSync(password, salt, 64).toString("hex");
     return hash === newHash;
   },
 
@@ -101,19 +102,19 @@ export const passwordUtils = {
     const errors: string[] = [];
 
     if (password.length < 8) {
-      errors.push('Password must be at least 8 characters');
+      errors.push("Password must be at least 8 characters");
     }
     if (!/[A-Z]/.test(password)) {
-      errors.push('Password must contain uppercase letter');
+      errors.push("Password must contain uppercase letter");
     }
     if (!/[a-z]/.test(password)) {
-      errors.push('Password must contain lowercase letter');
+      errors.push("Password must contain lowercase letter");
     }
     if (!/\d/.test(password)) {
-      errors.push('Password must contain a number');
+      errors.push("Password must contain a number");
     }
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      errors.push('Password must contain a special character');
+      errors.push("Password must contain a special character");
     }
 
     return { valid: errors.length === 0, errors };
@@ -128,15 +129,19 @@ export const tokenUtils = {
    * Generate secure random token
    */
   generate(length = 32): string {
-    return crypto.randomBytes(length).toString('hex');
+    return crypto.randomBytes(length).toString("hex");
   },
 
   /**
    * Generate API key with prefix
    */
-  generateApiKey(prefix = 'nxs'): { key: string; keyHash: string; keyPrefix: string } {
-    const key = `${prefix}_${crypto.randomBytes(24).toString('base64url')}`;
-    const keyHash = crypto.createHash('sha256').update(key).digest('hex');
+  generateApiKey(prefix = "nxs"): {
+    key: string;
+    keyHash: string;
+    keyPrefix: string;
+  } {
+    const key = `${prefix}_${crypto.randomBytes(24).toString("base64url")}`;
+    const keyHash = crypto.createHash("sha256").update(key).digest("hex");
     const keyPrefix = key.slice(0, 8);
 
     return { key, keyHash, keyPrefix };
@@ -146,7 +151,7 @@ export const tokenUtils = {
    * Hash a token for storage
    */
   hash(token: string): string {
-    return crypto.createHash('sha256').update(token).digest('hex');
+    return crypto.createHash("sha256").update(token).digest("hex");
   },
 
   /**
@@ -159,11 +164,37 @@ export const tokenUtils = {
 };
 
 /**
- * Session manager
+ * Session manager with Redis persistence
  */
 export class SessionManager {
-  private sessions = new Map<string, Session>();
-  private userSessions = new Map<string, Set<string>>();
+  private redis: Redis;
+
+  constructor(redisUrl?: string) {
+    const url = redisUrl || process.env.REDIS_URL;
+    if (!url) {
+      throw new Error(
+        "Redis URL required. Set REDIS_URL environment variable.",
+      );
+    }
+    this.redis = new Redis(url, {
+      maxRetriesPerRequest: 3,
+      retryStrategy(times) {
+        const delay = Math.min(times * 50, 2000);
+        return delay;
+      },
+      enableReadyCheck: true,
+      enableOfflineQueue: true,
+    });
+
+    // Handle connection errors
+    this.redis.on("error", (err) => {
+      console.error("Redis connection error:", err);
+    });
+
+    this.redis.on("connect", () => {
+      console.log("Redis connected successfully");
+    });
+  }
 
   /**
    * Create a new session
@@ -176,7 +207,7 @@ export class SessionManager {
       ip?: string;
       userAgent?: string;
       metadata?: Record<string, unknown>;
-    }
+    },
   ): Promise<Session> {
     const expiresIn = options?.expiresIn ?? 3600 * 24; // 24 hours default
 
@@ -194,13 +225,18 @@ export class SessionManager {
       metadata: options?.metadata || {},
     };
 
-    this.sessions.set(session.id, session);
+    // Store session in Redis with expiration
+    const pipeline = this.redis.pipeline();
+    pipeline.setex(`session:${session.id}`, expiresIn, JSON.stringify(session));
 
-    // Track user sessions
-    if (!this.userSessions.has(userId)) {
-      this.userSessions.set(userId, new Set());
-    }
-    this.userSessions.get(userId)!.add(session.id);
+    // Store token to session mapping
+    pipeline.setex(`token:${session.token}`, expiresIn, session.id);
+
+    // Add to user's session list
+    pipeline.sadd(`user_sessions:${userId}`, session.id);
+    pipeline.expire(`user_sessions:${userId}`, expiresIn);
+
+    await pipeline.exec();
 
     return session;
   }
@@ -209,8 +245,10 @@ export class SessionManager {
    * Get session by ID
    */
   async get(sessionId: string): Promise<Session | null> {
-    const session = this.sessions.get(sessionId);
-    if (!session) return null;
+    const data = await this.redis.get(`session:${sessionId}`);
+    if (!data) return null;
+
+    const session: Session = JSON.parse(data);
 
     // Check expiration
     if (new Date() > session.expiresAt) {
@@ -225,25 +263,29 @@ export class SessionManager {
    * Get session by token
    */
   async getByToken(token: string): Promise<Session | null> {
-    for (const session of this.sessions.values()) {
-      if (session.token === token) {
-        if (new Date() > session.expiresAt) {
-          await this.revoke(session.id);
-          return null;
-        }
-        return session;
-      }
-    }
-    return null;
+    const sessionId = await this.redis.get(`token:${token}`);
+    if (!sessionId) return null;
+
+    return await this.get(sessionId);
   }
 
   /**
    * Update session activity
    */
   async touch(sessionId: string): Promise<void> {
-    const session = this.sessions.get(sessionId);
-    if (session) {
-      session.lastActiveAt = new Date();
+    const session = await this.get(sessionId);
+    if (!session) return;
+
+    session.lastActiveAt = new Date();
+
+    // Update session in Redis
+    const ttl = await this.redis.ttl(`session:${sessionId}`);
+    if (ttl > 0) {
+      await this.redis.setex(
+        `session:${sessionId}`,
+        ttl,
+        JSON.stringify(session),
+      );
     }
   }
 
@@ -251,11 +293,25 @@ export class SessionManager {
    * Revoke a session
    */
   async revoke(sessionId: string): Promise<boolean> {
-    const session = this.sessions.get(sessionId);
-    if (!session) return false;
+    const data = await this.redis.get(`session:${sessionId}`);
+    if (!data) return false;
 
-    this.sessions.delete(sessionId);
-    this.userSessions.get(session.userId)?.delete(sessionId);
+    const session: Session = JSON.parse(data);
+
+    const pipeline = this.redis.pipeline();
+
+    // Remove session
+    pipeline.del(`session:${sessionId}`);
+
+    // Remove token mapping
+    if (session.token) {
+      pipeline.del(`token:${session.token}`);
+    }
+
+    // Remove from user's session list
+    pipeline.srem(`user_sessions:${session.userId}`, sessionId);
+
+    await pipeline.exec();
 
     return true;
   }
@@ -264,16 +320,18 @@ export class SessionManager {
    * Revoke all sessions for a user
    */
   async revokeAllForUser(userId: string): Promise<number> {
-    const sessionIds = this.userSessions.get(userId);
-    if (!sessionIds) return 0;
+    const sessionIds = await this.redis.smembers(`user_sessions:${userId}`);
+    if (!sessionIds || sessionIds.length === 0) return 0;
 
     let count = 0;
     for (const sessionId of sessionIds) {
-      this.sessions.delete(sessionId);
-      count++;
+      const revoked = await this.revoke(sessionId);
+      if (revoked) count++;
     }
 
-    this.userSessions.delete(userId);
+    // Clear user's session list
+    await this.redis.del(`user_sessions:${userId}`);
+
     return count;
   }
 
@@ -281,12 +339,16 @@ export class SessionManager {
    * Get all sessions for a user
    */
   async getUserSessions(userId: string): Promise<Session[]> {
-    const sessionIds = this.userSessions.get(userId);
-    if (!sessionIds) return [];
+    const sessionIds = await this.redis.smembers(`user_sessions:${userId}`);
+    if (!sessionIds || sessionIds.length === 0) return [];
 
     const sessions: Session[] = [];
-    for (const sessionId of sessionIds) {
-      const session = await this.get(sessionId);
+
+    // Fetch all sessions in parallel
+    const promises = sessionIds.map((id) => this.get(id));
+    const results = await Promise.all(promises);
+
+    for (const session of results) {
       if (session) {
         sessions.push(session);
       }
@@ -299,22 +361,58 @@ export class SessionManager {
    * Cleanup expired sessions
    */
   async cleanup(): Promise<number> {
-    const now = new Date();
-    let removed = 0;
+    // Redis automatically handles expiration of keys
+    // This method is kept for API compatibility
+    return 0;
+  }
 
-    for (const [id, session] of this.sessions) {
-      if (now > session.expiresAt) {
-        await this.revoke(id);
-        removed++;
-      }
-    }
+  /**
+   * Get session count for a user
+   */
+  async getUserSessionCount(userId: string): Promise<number> {
+    return await this.redis.scard(`user_sessions:${userId}`);
+  }
 
-    return removed;
+  /**
+   * Check if session exists
+   */
+  async exists(sessionId: string): Promise<boolean> {
+    return (await this.redis.exists(`session:${sessionId}`)) > 0;
+  }
+
+  /**
+   * Disconnect from Redis
+   */
+  async disconnect(): Promise<void> {
+    await this.redis.quit();
   }
 }
 
-// Global session manager
-export const sessionManager = new SessionManager();
+// Global session manager instance
+let sessionManagerInstance: SessionManager | null = null;
+
+/**
+ * Get or create session manager instance
+ */
+export const getSessionManager = (): SessionManager => {
+  if (!sessionManagerInstance) {
+    sessionManagerInstance = new SessionManager();
+  }
+  return sessionManagerInstance;
+};
+
+/**
+ * Initialize session manager with custom Redis URL
+ */
+export const initSessionManager = (redisUrl: string): SessionManager => {
+  sessionManagerInstance = new SessionManager(redisUrl);
+  return sessionManagerInstance;
+};
+
+/**
+ * Legacy export for backward compatibility
+ */
+export const sessionManager = getSessionManager();
 
 /**
  * Authentication middleware
@@ -325,20 +423,24 @@ export const authMiddleware = (options?: {
 }) => {
   const { required = true, allowApiKey = true } = options || {};
 
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  return async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       let session: Session | null = null;
 
       // Try Bearer token first
       const authHeader = req.headers.authorization;
-      if (authHeader?.startsWith('Bearer ')) {
+      if (authHeader?.startsWith("Bearer ")) {
         const token = authHeader.slice(7);
         session = await sessionManager.getByToken(token);
       }
 
       // Try API key if allowed
       if (!session && allowApiKey) {
-        const apiKey = req.headers['x-api-key'] as string;
+        const apiKey = req.headers["x-api-key"] as string;
         if (apiKey) {
           // In production, verify against stored API keys
           // For now, this is a placeholder
@@ -346,13 +448,15 @@ export const authMiddleware = (options?: {
       }
 
       if (!session && required) {
-        res.status(401).json({ error: 'Authentication required' });
+        res.status(401).json({ error: "Authentication required" });
         return;
       }
 
       if (session) {
         await sessionManager.touch(session.id);
-        (req as Request & { user?: { id: string }; session?: Session }).user = { id: session.userId };
+        (req as Request & { user?: { id: string }; session?: Session }).user = {
+          id: session.userId,
+        };
         (req as Request & { session?: Session }).session = session;
       }
 
@@ -371,7 +475,7 @@ export const createAuthContext = async (opts: {
 }): Promise<{ userId?: string; session?: Session }> => {
   const authHeader = opts.req.headers.authorization;
 
-  if (!authHeader?.startsWith('Bearer ')) {
+  if (!authHeader?.startsWith("Bearer ")) {
     return {};
   }
 
@@ -400,8 +504,8 @@ export const requireAuth = () => {
   }) => {
     if (!opts.ctx.userId) {
       throw new TRPCError({
-        code: 'UNAUTHORIZED',
-        message: 'Authentication required',
+        code: "UNAUTHORIZED",
+        message: "Authentication required",
       });
     }
     return opts.next();
@@ -429,7 +533,10 @@ export const loginRateLimiter = {
     if (entry.count >= this.maxAttempts) {
       const lockoutEnd = entry.lastAttempt + this.lockoutMs;
       if (now < lockoutEnd) {
-        return { allowed: false, retryAfter: Math.ceil((lockoutEnd - now) / 1000) };
+        return {
+          allowed: false,
+          retryAfter: Math.ceil((lockoutEnd - now) / 1000),
+        };
       }
       // Lockout expired, reset
       this.attempts.delete(identifier);

@@ -15,19 +15,19 @@ export declare const RateLimitConfigSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     message: string;
     windowMs: number;
-    maxRequests: number;
-    keyGenerator: "user" | "custom" | "ip" | "tenant" | "api-key";
     skipFailedRequests: boolean;
     skipSuccessfulRequests: boolean;
+    keyGenerator: "ip" | "user" | "custom" | "tenant" | "api-key";
     headers: boolean;
+    maxRequests: number;
 }, {
     message?: string | undefined;
     windowMs?: number | undefined;
-    maxRequests?: number | undefined;
-    keyGenerator?: "user" | "custom" | "ip" | "tenant" | "api-key" | undefined;
     skipFailedRequests?: boolean | undefined;
     skipSuccessfulRequests?: boolean | undefined;
+    keyGenerator?: "ip" | "user" | "custom" | "tenant" | "api-key" | undefined;
     headers?: boolean | undefined;
+    maxRequests?: number | undefined;
 }>;
 export type RateLimitConfig = z.infer<typeof RateLimitConfigSchema>;
 export interface RateLimitEntry {

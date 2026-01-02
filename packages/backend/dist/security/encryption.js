@@ -1,17 +1,17 @@
-import crypto from 'crypto';
-import { z } from 'zod';
+import crypto from "crypto";
+import { z } from "zod";
 /**
  * Data Encryption Utilities
  * Secure encryption for sensitive data at rest and in transit
  */
 // Encryption algorithm options
 export const EncryptionAlgorithmSchema = z.enum([
-    'aes-256-gcm',
-    'aes-256-cbc',
-    'aes-128-gcm',
+    "aes-256-gcm",
+    "aes-256-cbc",
+    "aes-128-gcm",
 ]);
 const defaultConfig = {
-    algorithm: 'aes-256-gcm',
+    algorithm: "aes-256-gcm",
     keyDerivationIterations: 100000,
     saltLength: 16,
     ivLength: 12,
@@ -25,13 +25,22 @@ export class EncryptionService {
     config;
     constructor(masterKey, config) {
         this.config = { ...defaultConfig, ...config };
-        if (typeof masterKey === 'string') {
-            // Derive key from passphrase
-            this.masterKey = crypto.scryptSync(masterKey, 'japavel-encryption-salt', 32, { N: 16384, r: 8, p: 1 });
+        if (typeof masterKey === "string") {
+            // Derive key from passphrase with secure salt from environment or random
+            const salt = process.env.ENCRYPTION_SALT || crypto.randomBytes(32).toString("hex");
+            if (!process.env.ENCRYPTION_SALT &&
+                process.env.NODE_ENV === "production") {
+                console.warn("⚠️  WARNING: Using random salt for encryption. Set ENCRYPTION_SALT environment variable for production!");
+            }
+            this.masterKey = crypto.scryptSync(masterKey, salt, 32, {
+                N: 16384,
+                r: 8,
+                p: 1,
+            });
         }
         else {
             if (masterKey.length !== 32) {
-                throw new Error('Master key must be 32 bytes for AES-256');
+                throw new Error("Master key must be 32 bytes for AES-256");
             }
             this.masterKey = masterKey;
         }
@@ -41,10 +50,10 @@ export class EncryptionService {
      */
     encrypt(plaintext) {
         const iv = crypto.randomBytes(this.config.ivLength);
-        const plaintextBuffer = typeof plaintext === 'string'
-            ? Buffer.from(plaintext, 'utf8')
+        const plaintextBuffer = typeof plaintext === "string"
+            ? Buffer.from(plaintext, "utf8")
             : plaintext;
-        if (this.config.algorithm.includes('gcm')) {
+        if (this.config.algorithm.includes("gcm")) {
             const cipher = crypto.createCipheriv(this.config.algorithm, this.masterKey, iv, { authTagLength: this.config.tagLength });
             const ciphertext = Buffer.concat([
                 cipher.update(plaintextBuffer),
@@ -52,9 +61,9 @@ export class EncryptionService {
             ]);
             const tag = cipher.getAuthTag();
             return {
-                ciphertext: ciphertext.toString('base64'),
-                iv: iv.toString('base64'),
-                tag: tag.toString('base64'),
+                ciphertext: ciphertext.toString("base64"),
+                iv: iv.toString("base64"),
+                tag: tag.toString("base64"),
                 algorithm: this.config.algorithm,
                 version: 1,
             };
@@ -67,8 +76,8 @@ export class EncryptionService {
                 cipher.final(),
             ]);
             return {
-                ciphertext: ciphertext.toString('base64'),
-                iv: iv.toString('base64'),
+                ciphertext: ciphertext.toString("base64"),
+                iv: iv.toString("base64"),
                 algorithm: this.config.algorithm,
                 version: 1,
             };
@@ -78,52 +87,50 @@ export class EncryptionService {
      * Decrypt data
      */
     decrypt(encrypted) {
-        const iv = Buffer.from(encrypted.iv, 'base64');
-        const ciphertext = Buffer.from(encrypted.ciphertext, 'base64');
-        if (encrypted.algorithm.includes('gcm')) {
+        const iv = Buffer.from(encrypted.iv, "base64");
+        const ciphertext = Buffer.from(encrypted.ciphertext, "base64");
+        if (encrypted.algorithm.includes("gcm")) {
             if (!encrypted.tag) {
-                throw new Error('Auth tag required for GCM mode');
+                throw new Error("Auth tag required for GCM mode");
             }
-            const tag = Buffer.from(encrypted.tag, 'base64');
+            const tag = Buffer.from(encrypted.tag, "base64");
             const decipher = crypto.createDecipheriv(encrypted.algorithm, this.masterKey, iv, { authTagLength: this.config.tagLength });
             decipher.setAuthTag(tag);
-            return Buffer.concat([
-                decipher.update(ciphertext),
-                decipher.final(),
-            ]);
+            return Buffer.concat([decipher.update(ciphertext), decipher.final()]);
         }
         else {
             const decipher = crypto.createDecipheriv(encrypted.algorithm, this.masterKey, iv);
-            return Buffer.concat([
-                decipher.update(ciphertext),
-                decipher.final(),
-            ]);
+            return Buffer.concat([decipher.update(ciphertext), decipher.final()]);
         }
     }
     /**
      * Decrypt to string
      */
     decryptToString(encrypted) {
-        return this.decrypt(encrypted).toString('utf8');
+        return this.decrypt(encrypted).toString("utf8");
     }
     /**
      * Encrypt with password (derives key from password)
      */
     encryptWithPassword(plaintext, password) {
         const salt = crypto.randomBytes(this.config.saltLength);
-        const key = crypto.scryptSync(password, salt, 32, { N: this.config.keyDerivationIterations });
+        const key = crypto.scryptSync(password, salt, 32, {
+            N: this.config.keyDerivationIterations,
+        });
         const iv = crypto.randomBytes(this.config.ivLength);
-        const cipher = crypto.createCipheriv(this.config.algorithm, key, iv, { authTagLength: this.config.tagLength });
+        const cipher = crypto.createCipheriv(this.config.algorithm, key, iv, {
+            authTagLength: this.config.tagLength,
+        });
         const ciphertext = Buffer.concat([
-            cipher.update(Buffer.from(plaintext, 'utf8')),
+            cipher.update(Buffer.from(plaintext, "utf8")),
             cipher.final(),
         ]);
         const tag = cipher.getAuthTag();
         return {
-            ciphertext: ciphertext.toString('base64'),
-            iv: iv.toString('base64'),
-            tag: tag.toString('base64'),
-            salt: salt.toString('base64'),
+            ciphertext: ciphertext.toString("base64"),
+            iv: iv.toString("base64"),
+            tag: tag.toString("base64"),
+            salt: salt.toString("base64"),
             algorithm: this.config.algorithm,
             version: 1,
         };
@@ -133,50 +140,54 @@ export class EncryptionService {
      */
     decryptWithPassword(encrypted, password) {
         if (!encrypted.salt) {
-            throw new Error('Salt required for password decryption');
+            throw new Error("Salt required for password decryption");
         }
-        const salt = Buffer.from(encrypted.salt, 'base64');
-        const key = crypto.scryptSync(password, salt, 32, { N: this.config.keyDerivationIterations });
-        const iv = Buffer.from(encrypted.iv, 'base64');
-        const ciphertext = Buffer.from(encrypted.ciphertext, 'base64');
-        const tag = Buffer.from(encrypted.tag, 'base64');
-        const decipher = crypto.createDecipheriv(encrypted.algorithm, key, iv, { authTagLength: this.config.tagLength });
+        const salt = Buffer.from(encrypted.salt, "base64");
+        const key = crypto.scryptSync(password, salt, 32, {
+            N: this.config.keyDerivationIterations,
+        });
+        const iv = Buffer.from(encrypted.iv, "base64");
+        const ciphertext = Buffer.from(encrypted.ciphertext, "base64");
+        const tag = Buffer.from(encrypted.tag, "base64");
+        const decipher = crypto.createDecipheriv(encrypted.algorithm, key, iv, {
+            authTagLength: this.config.tagLength,
+        });
         decipher.setAuthTag(tag);
         const plaintext = Buffer.concat([
             decipher.update(ciphertext),
             decipher.final(),
         ]);
-        return plaintext.toString('utf8');
+        return plaintext.toString("utf8");
     }
     /**
      * Generate a new encryption key
      */
     static generateKey() {
-        return crypto.randomBytes(32).toString('base64');
+        return crypto.randomBytes(32).toString("base64");
     }
     /**
      * Hash sensitive data (one-way)
      */
     static hash(data, salt) {
-        const actualSalt = salt || crypto.randomBytes(16).toString('hex');
-        const hash = crypto.scryptSync(data, actualSalt, 64).toString('hex');
+        const actualSalt = salt || crypto.randomBytes(16).toString("hex");
+        const hash = crypto.scryptSync(data, actualSalt, 64).toString("hex");
         return `${actualSalt}:${hash}`;
     }
     /**
      * Verify hashed data
      */
     static verifyHash(data, storedHash) {
-        const [salt, hash] = storedHash.split(':');
-        const newHash = crypto.scryptSync(data, salt, 64).toString('hex');
+        const [salt, hash] = storedHash.split(":");
+        const newHash = crypto.scryptSync(data, salt, 64).toString("hex");
         return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(newHash));
     }
     /**
      * Generate HMAC for data integrity
      */
     hmac(data) {
-        const hmac = crypto.createHmac('sha256', this.masterKey);
+        const hmac = crypto.createHmac("sha256", this.masterKey);
         hmac.update(data);
-        return hmac.digest('base64');
+        return hmac.digest("base64");
     }
     /**
      * Verify HMAC
@@ -203,9 +214,12 @@ export class FieldEncryption {
     encryptFields(data) {
         const result = { ...data };
         for (const field of this.fields) {
-            if (field in result && result[field] !== null && result[field] !== undefined) {
+            if (field in result &&
+                result[field] !== null &&
+                result[field] !== undefined) {
                 const value = String(result[field]);
-                result[field] = this.encryption.encrypt(value);
+                result[field] =
+                    this.encryption.encrypt(value);
             }
         }
         return result;
@@ -216,10 +230,13 @@ export class FieldEncryption {
     decryptFields(data) {
         const result = { ...data };
         for (const field of this.fields) {
-            if (field in result && result[field] !== null && result[field] !== undefined) {
+            if (field in result &&
+                result[field] !== null &&
+                result[field] !== undefined) {
                 const encrypted = result[field];
                 if (encrypted.ciphertext && encrypted.iv) {
-                    result[field] = this.encryption.decryptToString(encrypted);
+                    result[field] =
+                        this.encryption.decryptToString(encrypted);
                 }
             }
         }
@@ -234,57 +251,57 @@ export const dataMasking = {
      * Mask email address
      */
     email(email) {
-        const [local, domain] = email.split('@');
+        const [local, domain] = email.split("@");
         if (!domain)
             return email;
         const maskedLocal = local.length > 2
-            ? local[0] + '*'.repeat(local.length - 2) + local[local.length - 1]
-            : '*'.repeat(local.length);
+            ? local[0] + "*".repeat(local.length - 2) + local[local.length - 1]
+            : "*".repeat(local.length);
         return `${maskedLocal}@${domain}`;
     },
     /**
      * Mask phone number
      */
     phone(phone) {
-        const digits = phone.replace(/\D/g, '');
+        const digits = phone.replace(/\D/g, "");
         if (digits.length < 4)
-            return '*'.repeat(phone.length);
-        return digits.slice(0, 3) + '*'.repeat(digits.length - 6) + digits.slice(-3);
+            return "*".repeat(phone.length);
+        return (digits.slice(0, 3) + "*".repeat(digits.length - 6) + digits.slice(-3));
     },
     /**
      * Mask credit card number
      */
     creditCard(number) {
-        const digits = number.replace(/\D/g, '');
+        const digits = number.replace(/\D/g, "");
         if (digits.length < 4)
-            return '*'.repeat(number.length);
-        return '*'.repeat(digits.length - 4) + digits.slice(-4);
+            return "*".repeat(number.length);
+        return "*".repeat(digits.length - 4) + digits.slice(-4);
     },
     /**
      * Mask SSN
      */
     ssn(ssn) {
-        const digits = ssn.replace(/\D/g, '');
+        const digits = ssn.replace(/\D/g, "");
         if (digits.length !== 9)
-            return '*'.repeat(ssn.length);
-        return '***-**-' + digits.slice(-4);
+            return "*".repeat(ssn.length);
+        return "***-**-" + digits.slice(-4);
     },
     /**
      * Mask generic string (show first and last n characters)
      */
     string(str, showFirst = 2, showLast = 2) {
         if (str.length <= showFirst + showLast) {
-            return '*'.repeat(str.length);
+            return "*".repeat(str.length);
         }
         return (str.slice(0, showFirst) +
-            '*'.repeat(str.length - showFirst - showLast) +
+            "*".repeat(str.length - showFirst - showLast) +
             str.slice(-showLast));
     },
     /**
      * Mask IP address
      */
     ip(ip) {
-        const parts = ip.split('.');
+        const parts = ip.split(".");
         if (parts.length !== 4)
             return ip;
         return `${parts[0]}.${parts[1]}.***.***`;
@@ -296,7 +313,7 @@ export const dataMasking = {
 export const createEncryptionService = (masterKey, config) => {
     const key = masterKey || process.env.ENCRYPTION_KEY;
     if (!key) {
-        throw new Error('Encryption key required. Set ENCRYPTION_KEY environment variable.');
+        throw new Error("Encryption key required. Set ENCRYPTION_KEY environment variable.");
     }
     return new EncryptionService(key, config);
 };

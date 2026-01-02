@@ -34,7 +34,7 @@ export declare const JobSchema: z.ZodObject<{
     id: string;
     createdAt: Date;
     queue: string;
-    priority: "critical" | "low" | "normal" | "high";
+    priority: "normal" | "critical" | "low" | "high";
     attempts: number;
     maxAttempts: number;
     backoff: number;
@@ -54,9 +54,9 @@ export declare const JobSchema: z.ZodObject<{
     createdAt: Date;
     queue: string;
     error?: string | undefined;
-    tenantId?: string | undefined;
     status?: "pending" | "cancelled" | "running" | "completed" | "failed" | "retrying" | undefined;
-    priority?: "critical" | "low" | "normal" | "high" | undefined;
+    tenantId?: string | undefined;
+    priority?: "normal" | "critical" | "low" | "high" | undefined;
     attempts?: number | undefined;
     maxAttempts?: number | undefined;
     backoff?: number | undefined;

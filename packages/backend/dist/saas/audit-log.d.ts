@@ -21,18 +21,18 @@ export declare const AuditEventSchema: z.ZodObject<{
         ip: z.ZodOptional<z.ZodString>;
         userAgent: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        type: "user" | "service" | "system" | "anonymous";
+        type: "user" | "system" | "service" | "anonymous";
         email?: string | undefined;
         name?: string | undefined;
-        id?: string | undefined;
         ip?: string | undefined;
+        id?: string | undefined;
         userAgent?: string | undefined;
     }, {
-        type: "user" | "service" | "system" | "anonymous";
+        type: "user" | "system" | "service" | "anonymous";
         email?: string | undefined;
         name?: string | undefined;
-        id?: string | undefined;
         ip?: string | undefined;
+        id?: string | undefined;
         userAgent?: string | undefined;
     }>;
     category: z.ZodEnum<["auth", "access", "data", "admin", "billing", "security", "integration", "system"]>;
@@ -85,8 +85,8 @@ export declare const AuditEventSchema: z.ZodObject<{
             city?: string | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
-        requestId?: string | undefined;
         sessionId?: string | undefined;
+        requestId?: string | undefined;
         correlationId?: string | undefined;
         source?: string | undefined;
         location?: {
@@ -95,8 +95,8 @@ export declare const AuditEventSchema: z.ZodObject<{
             city?: string | undefined;
         } | undefined;
     }, {
-        requestId?: string | undefined;
         sessionId?: string | undefined;
+        requestId?: string | undefined;
         correlationId?: string | undefined;
         source?: string | undefined;
         location?: {
@@ -108,22 +108,22 @@ export declare const AuditEventSchema: z.ZodObject<{
     metadata: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     tags: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
-    description: string;
-    id: string;
     timestamp: Date;
+    id: string;
+    metadata: Record<string, unknown>;
+    action: string;
+    description: string;
     actor: {
-        type: "user" | "service" | "system" | "anonymous";
+        type: "user" | "system" | "service" | "anonymous";
         email?: string | undefined;
         name?: string | undefined;
-        id?: string | undefined;
         ip?: string | undefined;
+        id?: string | undefined;
         userAgent?: string | undefined;
     };
-    category: "data" | "admin" | "system" | "auth" | "access" | "billing" | "security" | "integration";
-    action: string;
-    severity: "error" | "info" | "warning" | "critical";
-    outcome: "success" | "failure" | "pending" | "partial";
-    metadata: Record<string, unknown>;
+    category: "security" | "data" | "access" | "admin" | "billing" | "auth" | "integration" | "system";
+    severity: "info" | "error" | "warning" | "critical";
+    outcome: "pending" | "success" | "failure" | "partial";
     tags: string[];
     tenantId?: string | undefined;
     resource?: {
@@ -137,8 +137,8 @@ export declare const AuditEventSchema: z.ZodObject<{
         fields?: string[] | undefined;
     } | undefined;
     context?: {
-        requestId?: string | undefined;
         sessionId?: string | undefined;
+        requestId?: string | undefined;
         correlationId?: string | undefined;
         source?: string | undefined;
         location?: {
@@ -148,22 +148,23 @@ export declare const AuditEventSchema: z.ZodObject<{
         } | undefined;
     } | undefined;
 }, {
-    description: string;
-    id: string;
     timestamp: Date;
+    id: string;
+    action: string;
+    description: string;
     actor: {
-        type: "user" | "service" | "system" | "anonymous";
+        type: "user" | "system" | "service" | "anonymous";
         email?: string | undefined;
         name?: string | undefined;
-        id?: string | undefined;
         ip?: string | undefined;
+        id?: string | undefined;
         userAgent?: string | undefined;
     };
-    category: "data" | "admin" | "system" | "auth" | "access" | "billing" | "security" | "integration";
-    action: string;
+    category: "security" | "data" | "access" | "admin" | "billing" | "auth" | "integration" | "system";
     tenantId?: string | undefined;
-    severity?: "error" | "info" | "warning" | "critical" | undefined;
-    outcome?: "success" | "failure" | "pending" | "partial" | undefined;
+    metadata?: Record<string, unknown> | undefined;
+    severity?: "info" | "error" | "warning" | "critical" | undefined;
+    outcome?: "pending" | "success" | "failure" | "partial" | undefined;
     resource?: {
         type: string;
         id: string;
@@ -175,8 +176,8 @@ export declare const AuditEventSchema: z.ZodObject<{
         fields?: string[] | undefined;
     } | undefined;
     context?: {
-        requestId?: string | undefined;
         sessionId?: string | undefined;
+        requestId?: string | undefined;
         correlationId?: string | undefined;
         source?: string | undefined;
         location?: {
@@ -185,7 +186,6 @@ export declare const AuditEventSchema: z.ZodObject<{
             city?: string | undefined;
         } | undefined;
     } | undefined;
-    metadata?: Record<string, unknown> | undefined;
     tags?: string[] | undefined;
 }>;
 export type AuditEvent = z.infer<typeof AuditEventSchema>;

@@ -82,16 +82,16 @@ export declare const FeatureFlagSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
+    key: string;
     type: "boolean" | "percentage" | "variant" | "allowlist" | "schedule";
     status: "active" | "inactive" | "archived";
     name: string;
     id: string;
-    metadata: Record<string, unknown>;
-    tags: string[];
-    key: string;
-    defaultValue: boolean;
     createdAt: Date;
+    metadata: Record<string, unknown>;
     updatedAt: Date;
+    tags: string[];
+    defaultValue: boolean;
     description?: string | undefined;
     owner?: string | undefined;
     startDate?: Date | undefined;
@@ -112,19 +112,19 @@ export declare const FeatureFlagSchema: z.ZodObject<{
         operator: "equals" | "not_equals" | "contains" | "not_contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "in_list" | "not_in_list" | "regex";
     }[] | undefined;
 }, {
+    key: string;
     type: "boolean" | "percentage" | "variant" | "allowlist" | "schedule";
     name: string;
     id: string;
-    key: string;
     createdAt: Date;
     updatedAt: Date;
-    description?: string | undefined;
     status?: "active" | "inactive" | "archived" | undefined;
     metadata?: Record<string, unknown> | undefined;
-    tags?: string[] | undefined;
+    description?: string | undefined;
     owner?: string | undefined;
     startDate?: Date | undefined;
     endDate?: Date | undefined;
+    tags?: string[] | undefined;
     percentage?: number | undefined;
     defaultValue?: boolean | undefined;
     variants?: {

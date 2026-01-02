@@ -1,17 +1,493 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+// ============================================================================
+// USER & AUTHENTICATION MODELS
+// ============================================================================
+
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  role      String   @default("user")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String   @id @default(uuid())
+  email            String   @unique @db.VarChar(255)
+  emailVerified    Boolean  @default(false)
+  passwordHash     String?  @db.VarChar(255)
+  name             String?  @db.VarChar(255)
+  role             String   @default("user") @db.VarChar(50)
+
+  // Security fields
+  failedLoginAttempts Int    @default(0)
+  lockedUntil          DateTime?
+  lastLoginAt          DateTime?
+  passwordUpdatedAt    DateTime?
+
+  // Two-factor authentication
+  mfaEnabled       Boolean  @default(false)
+  mfaSecret        String?  @unique
+  backupCodes      String[] @default([])
+
+  // Timestamps
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  deletedAt        DateTime?
+
+  // Relations
+  sessions         Session[]
+  apiKeys          ApiKey[]
+  auditLogs        AuditLog[]
+  consentRecords   ConsentRecord[]
+  dataSubjectRequests DataSubjectRequest[]
+
+  @@index([email, deletedAt])
+  @@index([role])
+  @@index([emailVerified])
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  token        String   @unique @db.VarChar(255)
+  refreshToken String?  @unique @db.VarChar(255)
+
+  // Session metadata
+  ipAddress      String?   @db.VarChar(45)
+  userAgent      String?   @db.VarChar(500)
+  deviceInfo     String?   @db.VarChar(100)
+  location       String?   @db.VarChar(100)
+
+  // Security
+  expiresAt      DateTime
+  lastActiveAt   DateTime  @default(now())
+  revokedAt      DateTime?
+  revokeReason   String?   @db.VarChar(100)
+
+  // Metadata
+  metadata       Json?
+
+  // Relations
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@index([revokedAt])
+  @@map("sessions")
+}
+
+model ApiKey {
+  id          String    @id @default(uuid())
+  userId      String
+  name        String    @db.VarChar(100)
+
+  // Security
+  keyHash     String    @unique @db.VarChar(255)
+  keyPrefix   String    @db.VarChar(20)
+  scopes      String[]  @default([])
+  rateLimit   Int?
+
+  // Lifecycle
+  expiresAt   DateTime?
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  revokeReason String?  @db.VarChar(100)
+
+  // Audit
+  createdBy   String    @db.VarChar(100)
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([keyHash])
+  @@index([keyPrefix])
+  @@index([expiresAt])
+  @@index([revokedAt])
+  @@map("api_keys")
+}
+
+// ============================================================================
+// AUDIT & COMPLIANCE MODELS
+// ============================================================================
+
+model AuditLog {
+  id          String   @id @default(uuid())
+
+  // Event details
+  category    String   @db.VarChar(50)
+  action      String   @db.VarChar(100)
+  description String   @db.VarChar(500)
+  outcome     String   @db.VarChar(50)  // success, failure, error
+  severity    String   @db.VarChar(20)  // debug, info, warn, error, critical
+
+  // Actor information
+  actorId     String?  @db.VarChar(100)
+  actorType   String?  @db.VarChar(50)
+  ipAddress   String?  @db.VarChar(45)
+  userAgent   String?  @db.VarChar(500)
+
+  // Resource affected
+  resourceType String? @db.VarChar(100)
+  resourceId   String? @db.VarChar(100)
+
+  // Additional metadata
+  metadata    Json?
+  changes     Json?    // Before/after values
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+
+  // Relations
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tenantId    String?  @map("tenant_id")
+
+  @@index([userId])
+  @@index([category, action])
+  @@index([resourceType, resourceId])
+  @@index([createdAt])
+  @@index([actorId])
+  @@map("audit_logs")
+}
+
+model ConsentRecord {
+  id          String   @id @default(uuid())
+  userId      String
+
+  // Consent details
+  purpose     String   @db.VarChar(200)
+  version     String   @db.VarChar(50)
+  granted     Boolean
+
+  // Lifecycle
+  grantedAt   DateTime?
+  revokedAt   DateTime?
+  expiresAt   DateTime?
+
+  // Origin
+  source      String   @db.VarChar(100)
+  ipAddress   String?  @db.VarChar(45)
+  userAgent   String?  @db.VarChar(500)
+
+  // Metadata
+  metadata    Json?
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenantId    String?  @map("tenant_id")
+
+  @@index([userId, purpose])
+  @@index([granted, expiresAt])
+  @@index([revokedAt])
+  @@map("consent_records")
+}
+
+model DataSubjectRequest {
+  id              String   @id @default(uuid())
+  userId          String
+
+  // Request details
+  type            String   @db.VarChar(50)  // access, rectification, erasure, portability, restriction, objection
+  status          String   @default("pending") @db.VarChar(50)
+  description     String?  @db.Text
+
+  // Verification
+  verificationMethod String @db.VarChar(100)
+  verifiedAt      DateTime?
+
+  // Timeline
+  deadline        DateTime
+  completedAt     DateTime?
+
+  // Response
+  response        String?  @db.Text
+  attachments     String[] @default([])
+
+  // Assignment
+  assignedTo      String?  @uuid
+
+  // Metadata
+  metadata        Json?
+
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenantId        String?  @map("tenant_id")
+
+  @@index([userId, status])
+  @@index([type])
+  @@index([deadline])
+  @@index([status, deadline])
+  @@map("data_subject_requests")
+}
+
+// ============================================================================
+// TENANCY MODELS (Multi-tenancy support)
+// ============================================================================
+
+model Tenant {
+  id                String   @id @default(uuid())
+  name              String   @db.VarChar(200)
+  slug              String   @unique @db.VarChar(100)
+
+  // Subscription
+  plan              String   @default("free") @db.VarChar(50)
+  status            String   @default("active") @db.VarChar(50)
+  subscriptionEnds  DateTime?
+
+  // Configuration
+  settings          Json?
+  features          String[] @default([])
+
+  // Limits
+  maxUsers          Int      @default(5)
+  maxStorageMB      Int      @default(1000)
+
+  // Timestamps
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  users             User[]   @relation()
+
+  @@index([slug])
+  @@index([status])
+  @@index([plan])
+  @@map("tenants")
+}
+
+// ============================================================================
+// RATE LIMITING MODELS
+// ============================================================================
+
+model RateLimit {
+  id          String   @id @default(uuid())
+
+  // Identification
+  identifier  String   @unique @db.VarChar(255)  // email, IP, userId, etc.
+  identifierType String @db.VarChar(50)          // email, ip, user_id
+
+  // Limits
+  count       Int      @default(0)
+  windowStart DateTime @default(now())
+  windowEnd   DateTime
+
+  // Lockout
+  lockedUntil DateTime?
+  lockoutCount Int      @default(0)
+
+  // Metadata
+  metadata    Json?
+
+  @@index([identifierType, identifier])
+  @@index([windowEnd])
+  @@index([lockedUntil])
+  @@map("rate_limits")
+}
+
+// ============================================================================
+// JOB / QUEUE MODELS (for background tasks)
+// ============================================================================
+
+model Job {
+  id          String   @id @default(uuid())
+
+  // Job details
+  queue       String   @db.VarChar(100)
+  type        String   @db.VarChar(100)
+  priority    Int      @default(0)
+
+  // Payload
+  payload     Json
+
+  // Status
+  status      String   @default("pending") @db.VarChar(50)  // pending, processing, completed, failed
+  result      Json?
+  error       String?  @db.Text
+
+  // Attempts
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(3)
+
+  // Timing
+  scheduledAt DateTime @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  // Retry
+  failedAt    DateTime?
+  nextAttemptAt DateTime?
+
+  @@index([queue, status])
+  @@index([status, scheduledAt])
+  @@index([status, nextAttemptAt])
+  @@map("jobs")
+}
+
+// ============================================================================
+// NOTIFICATION MODELS
+// ============================================================================
+
+model Notification {
+  id          String   @id @default(uuid())
+
+  // Recipient
+  userId      String?  @uuid
+  tenantId    String?  @uuid
+  email       String?  @db.VarChar(255)
+
+  // Content
+  type        String   @db.VarChar(50)
+  title       String   @db.VarChar(200)
+  body        String   @db.Text
+
+  // Channels
+  channels    String[] @default(["email"])  // email, sms, push, in-app
+
+  // Status
+  status      String   @default("pending") @db.VarChar(50)  // pending, sent, failed
+  sentAt      DateTime?
+  error       String?  @db.Text
+
+  // Metadata
+  metadata    Json?
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([email, status])
+  @@index([status, createdAt])
+  @@map("notifications")
+}
+
+// ============================================================================
+// SETTINGS / CONFIGURATION MODELS
+// ============================================================================
+
+model Setting {
+  id          String   @id @default(uuid())
+
+  // Key-value pair
+  key         String   @unique @db.VarChar(100)
+  value       String   @db.Text
+  type        String   @default("string") @db.VarChar(50)  // string, number, boolean, json
+
+  // Scope
+  scope       String   @default("global") @db.VarChar(50)   // global, tenant, user
+  scopeId     String?  @uuid
+
+  // Validation
+  validation  Json?
+
+  // Metadata
+  description String?  @db.VarChar(500)
+  category    String?  @db.VarChar(100)
+
+  // Audit
+  updatedAtBy String?  @uuid
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+  @@index([scope, scopeId])
+  @@index([category])
+  @@map("settings")
+}
+
+// ============================================================================
+// HEALTH & METRICS MODELS (for monitoring)
+// ============================================================================
+
+model HealthCheck {
+  id          String   @id @default(uuid())
+
+  // Check details
+  service     String   @db.VarChar(100)
+  status      String   @db.VarChar(20)  // healthy, degraded, unhealthy
+
+  // Metrics
+  responseTime Int?    // milliseconds
+  message     String?  @db.Text
+  details     Json?
+
+  // Timestamps
+  checkedAt   DateTime @default(now())
+
+  @@index([service, checkedAt])
+  @@index([status])
+  @@map("health_checks")
+}
+
+model Metric {
+  id          String   @id @default(uuid())
+
+  // Metric details
+  name        String   @db.VarChar(100)
+  value       Float
+  unit        String?  @db.VarChar(20)  // ms, mb, count, percent
+
+  // Dimensions
+  tags        Json?
+
+  // Context
+  service     String?  @db.VarChar(100)
+  host        String?  @db.VarChar(100)
+
+  // Timestamps
+  recordedAt  DateTime @default(now())
+
+  @@index([name, recordedAt])
+  @@index([service, recordedAt])
+  @@map("metrics")
+}
+
+// ============================================================================
+// SECURITY EVENT LOGS
+// ============================================================================
+
+model SecurityEvent {
+  id          String   @id @default(uuid())
+
+  // Event details
+  type        String   @db.VarChar(100)
+  severity    String   @db.VarChar(20)  // low, medium, high, critical
+  description String   @db.Text
+
+  // Source
+  source      String   @db.VarChar(100)  // auth, authz, data, network, application
+  sourceIp    String?  @db.VarChar(45)
+
+  // Target
+  targetType  String?  @db.VarChar(50)   // user, session, api_key, tenant
+  targetId    String?  @db.VarChar(100)
+
+  // Details
+  metadata    Json?
+  evidence    Json?
+
+  // Mitigation
+  mitigated   Boolean  @default(false)
+  mitigatedAt DateTime?
+  mitigatedBy String?  @uuid
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+
+  @@index([type, severity])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+  @@index([sourceIp])
+  @@map("security_events")
 }

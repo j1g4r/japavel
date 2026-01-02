@@ -10,11 +10,11 @@ export declare const PermissionSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "read", "update", "delete", "list", "manage", "*"]>;
     conditions: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
-    action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
+    action: "*" | "create" | "delete" | "read" | "update" | "list" | "manage";
     resource: string;
     conditions?: Record<string, unknown> | undefined;
 }, {
-    action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
+    action: "*" | "create" | "delete" | "read" | "update" | "list" | "manage";
     resource: string;
     conditions?: Record<string, unknown> | undefined;
 }>;
@@ -28,11 +28,11 @@ export declare const RoleSchema: z.ZodObject<{
         action: z.ZodEnum<["create", "read", "update", "delete", "list", "manage", "*"]>;
         conditions: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     }, "strip", z.ZodTypeAny, {
-        action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
+        action: "*" | "create" | "delete" | "read" | "update" | "list" | "manage";
         resource: string;
         conditions?: Record<string, unknown> | undefined;
     }, {
-        action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
+        action: "*" | "create" | "delete" | "read" | "update" | "list" | "manage";
         resource: string;
         conditions?: Record<string, unknown> | undefined;
     }>, "many">;
@@ -44,7 +44,7 @@ export declare const RoleSchema: z.ZodObject<{
     id: string;
     metadata: Record<string, unknown>;
     permissions: {
-        action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
+        action: "*" | "create" | "delete" | "read" | "update" | "list" | "manage";
         resource: string;
         conditions?: Record<string, unknown> | undefined;
     }[];
@@ -55,12 +55,12 @@ export declare const RoleSchema: z.ZodObject<{
     name: string;
     id: string;
     permissions: {
-        action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
+        action: "*" | "create" | "delete" | "read" | "update" | "list" | "manage";
         resource: string;
         conditions?: Record<string, unknown> | undefined;
     }[];
-    description?: string | undefined;
     metadata?: Record<string, unknown> | undefined;
+    description?: string | undefined;
     inherits?: string[] | undefined;
     isSystem?: boolean | undefined;
 }>;
@@ -95,9 +95,9 @@ export declare const PolicySchema: z.ZodObject<{
         field: string;
         value?: unknown;
     }[];
-    effect: "allow" | "deny";
+    effect: "deny" | "allow";
     resources: string[];
-    actions: ("delete" | "create" | "read" | "update" | "list" | "manage" | "*")[];
+    actions: ("*" | "create" | "delete" | "read" | "update" | "list" | "manage")[];
     description?: string | undefined;
 }, {
     name: string;
@@ -107,9 +107,9 @@ export declare const PolicySchema: z.ZodObject<{
         field: string;
         value?: unknown;
     }[];
-    effect: "allow" | "deny";
+    effect: "deny" | "allow";
     resources: string[];
-    actions: ("delete" | "create" | "read" | "update" | "list" | "manage" | "*")[];
+    actions: ("*" | "create" | "delete" | "read" | "update" | "list" | "manage")[];
     description?: string | undefined;
     priority?: number | undefined;
 }>;

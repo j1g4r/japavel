@@ -20,7 +20,7 @@ export declare const UsageMetricSchema: z.ZodObject<{
     name: string;
     displayName: string;
     periods: ("minute" | "hour" | "day" | "week" | "month" | "year" | "all_time")[];
-    aggregation: "sum" | "max" | "last";
+    aggregation: "max" | "sum" | "last";
     description?: string | undefined;
     unit?: string | undefined;
 }, {
@@ -30,7 +30,7 @@ export declare const UsageMetricSchema: z.ZodObject<{
     description?: string | undefined;
     unit?: string | undefined;
     periods?: ("minute" | "hour" | "day" | "week" | "month" | "year" | "all_time")[] | undefined;
-    aggregation?: "sum" | "max" | "last" | undefined;
+    aggregation?: "max" | "sum" | "last" | undefined;
 }>;
 export type UsageMetric = z.infer<typeof UsageMetricSchema>;
 export interface UsageRecord {

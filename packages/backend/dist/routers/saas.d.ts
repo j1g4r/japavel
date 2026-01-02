@@ -27,7 +27,7 @@ export declare const saasRouter: import("@trpc/server").CreateRouterInner<import
         name: string;
         displayName: string;
         periods: ("minute" | "hour" | "day" | "week" | "month" | "year" | "all_time")[];
-        aggregation: "sum" | "max" | "last";
+        aggregation: "max" | "sum" | "last";
         description?: string | undefined;
         unit?: string | undefined;
     }[]>;
@@ -134,22 +134,22 @@ export declare const saasRouter: import("@trpc/server").CreateRouterInner<import
         _output_out: typeof import("@trpc/server").unsetMarker;
     }, {
         items: {
-            description: string;
-            id: string;
             timestamp: Date;
+            id: string;
+            metadata: Record<string, unknown>;
+            action: string;
+            description: string;
             actor: {
-                type: "user" | "service" | "system" | "anonymous";
+                type: "user" | "system" | "service" | "anonymous";
                 email?: string | undefined;
                 name?: string | undefined;
-                id?: string | undefined;
                 ip?: string | undefined;
+                id?: string | undefined;
                 userAgent?: string | undefined;
             };
-            category: "data" | "admin" | "system" | "auth" | "access" | "billing" | "security" | "integration";
-            action: string;
-            severity: "error" | "info" | "warning" | "critical";
-            outcome: "success" | "failure" | "pending" | "partial";
-            metadata: Record<string, unknown>;
+            category: "security" | "data" | "access" | "admin" | "billing" | "auth" | "integration" | "system";
+            severity: "info" | "error" | "warning" | "critical";
+            outcome: "pending" | "success" | "failure" | "partial";
             tags: string[];
             tenantId?: string | undefined;
             resource?: {
@@ -163,8 +163,8 @@ export declare const saasRouter: import("@trpc/server").CreateRouterInner<import
                 fields?: string[] | undefined;
             } | undefined;
             context?: {
-                requestId?: string | undefined;
                 sessionId?: string | undefined;
+                requestId?: string | undefined;
                 correlationId?: string | undefined;
                 source?: string | undefined;
                 location?: {

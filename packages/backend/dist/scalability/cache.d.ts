@@ -9,14 +9,14 @@ export declare const CacheConfigSchema: z.ZodObject<{
     keyPrefix: z.ZodDefault<z.ZodString>;
     serializer: z.ZodDefault<z.ZodEnum<["json", "msgpack"]>>;
 }, "strip", z.ZodTypeAny, {
-    defaultTTL: number;
     maxSize: number;
     keyPrefix: string;
+    defaultTTL: number;
     serializer: "json" | "msgpack";
 }, {
-    defaultTTL?: number | undefined;
     maxSize?: number | undefined;
     keyPrefix?: string | undefined;
+    defaultTTL?: number | undefined;
     serializer?: "json" | "msgpack" | undefined;
 }>;
 export type CacheConfig = z.infer<typeof CacheConfigSchema>;
@@ -28,19 +28,19 @@ export declare const CacheEntrySchema: z.ZodObject<{
     expiresAt: z.ZodOptional<z.ZodNumber>;
     tags: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
-    tags: string[];
     key: string;
     createdAt: number;
+    tags: string[];
     value?: unknown;
-    ttl?: number | undefined;
     expiresAt?: number | undefined;
+    ttl?: number | undefined;
 }, {
     key: string;
     createdAt: number;
     value?: unknown;
+    expiresAt?: number | undefined;
     tags?: string[] | undefined;
     ttl?: number | undefined;
-    expiresAt?: number | undefined;
 }>;
 export type CacheEntry = z.infer<typeof CacheEntrySchema>;
 /**

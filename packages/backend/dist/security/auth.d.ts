@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { Request, Response, NextFunction } from 'express';
+import { z } from "zod";
+import { Request, Response, NextFunction } from "express";
 /**
  * Authentication Patterns
  * Secure authentication utilities and middleware
@@ -20,28 +20,28 @@ export declare const SessionSchema: z.ZodObject<{
     metadata: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    metadata: Record<string, unknown>;
     userId: string;
-    createdAt: Date;
-    expiresAt: Date;
     token: string;
+    expiresAt: Date;
+    createdAt: Date;
     lastActiveAt: Date;
-    tenantId?: string | undefined;
-    ip?: string | undefined;
-    userAgent?: string | undefined;
+    metadata: Record<string, unknown>;
     refreshToken?: string | undefined;
+    ip?: string | undefined;
+    tenantId?: string | undefined;
+    userAgent?: string | undefined;
 }, {
     id: string;
     userId: string;
-    createdAt: Date;
-    expiresAt: Date;
     token: string;
+    expiresAt: Date;
+    createdAt: Date;
     lastActiveAt: Date;
-    tenantId?: string | undefined;
+    refreshToken?: string | undefined;
     ip?: string | undefined;
+    tenantId?: string | undefined;
     userAgent?: string | undefined;
     metadata?: Record<string, unknown> | undefined;
-    refreshToken?: string | undefined;
 }>;
 export type Session = z.infer<typeof SessionSchema>;
 export declare const ApiKeySchema: z.ZodObject<{
@@ -58,12 +58,12 @@ export declare const ApiKeySchema: z.ZodObject<{
     createdAt: z.ZodDate;
     revokedAt: z.ZodOptional<z.ZodDate>;
 }, "strip", z.ZodTypeAny, {
-    tenantId: string;
     name: string;
     id: string;
+    tenantId: string;
     createdAt: Date;
-    keyPrefix: string;
     keyHash: string;
+    keyPrefix: string;
     scopes: string[];
     createdBy: string;
     expiresAt?: Date | undefined;
@@ -71,16 +71,16 @@ export declare const ApiKeySchema: z.ZodObject<{
     lastUsedAt?: Date | undefined;
     revokedAt?: Date | undefined;
 }, {
-    tenantId: string;
     name: string;
     id: string;
+    tenantId: string;
     createdAt: Date;
-    keyPrefix: string;
     keyHash: string;
+    keyPrefix: string;
     createdBy: string;
     expiresAt?: Date | undefined;
-    scopes?: string[] | undefined;
     rateLimit?: number | undefined;
+    scopes?: string[] | undefined;
     lastUsedAt?: Date | undefined;
     revokedAt?: Date | undefined;
 }>;
@@ -101,10 +101,10 @@ export declare const AuthUserSchema: z.ZodObject<{
     email: string;
     id: string;
     createdAt: Date;
-    updatedAt: Date;
     emailVerified: boolean;
     mfaEnabled: boolean;
     failedLoginAttempts: number;
+    updatedAt: Date;
     passwordHash?: string | undefined;
     mfaSecret?: string | undefined;
     lockedUntil?: Date | undefined;
@@ -169,11 +169,11 @@ export declare const tokenUtils: {
     verify(token: string, hash: string): boolean;
 };
 /**
- * Session manager
+ * Session manager with Redis persistence
  */
 export declare class SessionManager {
-    private sessions;
-    private userSessions;
+    private redis;
+    constructor(redisUrl?: string);
     /**
      * Create a new session
      */
@@ -212,7 +212,30 @@ export declare class SessionManager {
      * Cleanup expired sessions
      */
     cleanup(): Promise<number>;
+    /**
+     * Get session count for a user
+     */
+    getUserSessionCount(userId: string): Promise<number>;
+    /**
+     * Check if session exists
+     */
+    exists(sessionId: string): Promise<boolean>;
+    /**
+     * Disconnect from Redis
+     */
+    disconnect(): Promise<void>;
 }
+/**
+ * Get or create session manager instance
+ */
+export declare const getSessionManager: () => SessionManager;
+/**
+ * Initialize session manager with custom Redis URL
+ */
+export declare const initSessionManager: (redisUrl: string) => SessionManager;
+/**
+ * Legacy export for backward compatibility
+ */
 export declare const sessionManager: SessionManager;
 /**
  * Authentication middleware
