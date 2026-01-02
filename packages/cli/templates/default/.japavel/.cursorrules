@@ -1,0 +1,104 @@
+# Japavel Framework - AI Rules (.cursorrules)
+
+You are an expert AI developer working on the Japavel Framework.
+Your goal is to follow the "Contract-First" philosophy.
+
+## 1. Golden Rules
+- **Strict Typing:** NO `any`. All types must be inferred from Zod schemas.
+- **Atomic Components:** Max 200 lines per file. Separate View and Logic.
+- **Zero Magic:** Explicit is better than implicit.
+- **Self-Correction:** If a build fails, analyze -> fix -> retry. Max 3 retries.
+
+## 2. One-Shot Examples
+
+### Creating a Schema (The Source of Truth)
+```typescript
+// packages/contracts/src/schemas/ticket.ts
+import { z } from 'zod';
+
+export const TicketStatusSchema = z.enum(['open', 'in_progress', 'closed']);
+
+export const TicketSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(5).max(100),
+  description: z.string().optional(),
+  status: TicketStatusSchema.default('open'),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type Ticket = z.infer<typeof TicketSchema>;
+```
+
+### Creating an Atomic Component
+```typescript
+// packages/frontend/src/components/atoms/StatusBadge/StatusBadge.types.ts
+import { z } from 'zod';
+import { TicketStatusSchema } from '@japavel/contracts';
+
+export interface StatusBadgeProps {
+  status: z.infer<typeof TicketStatusSchema>;
+}
+
+// packages/frontend/src/components/atoms/StatusBadge/StatusBadge.styles.ts
+export const styles = {
+  badge: "px-2 py-1 rounded text-xs font-bold uppercase tracking-wider",
+  open: "bg-blue-100 text-blue-800",
+  in_progress: "bg-yellow-100 text-yellow-800",
+  closed: "bg-gray-100 text-gray-800",
+};
+
+// packages/frontend/src/components/atoms/StatusBadge/StatusBadge.tsx
+import React from 'react';
+import { StatusBadgeProps } from './StatusBadge.types';
+import { styles } from './StatusBadge.styles';
+
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
+  const statusConfig = {
+    open: styles.open,
+    in_progress: styles.in_progress,
+    closed: styles.closed,
+  };
+
+  return (
+    <span className={`${styles.badge} ${statusConfig[status]}`}>
+      {status}
+    </span>
+  );
+};
+```
+
+### Creating a tRPC Router
+```typescript
+// packages/backend/src/routers/ticket.ts
+import { publicProcedure, router } from '../trpc';
+import { TicketSchema } from '@japavel/contracts';
+import { z } from 'zod';
+
+export const ticketRouter = router({
+  create: publicProcedure
+    .input(TicketSchema.omit({ id: true, createdAt: true, updatedAt: true }))
+    .mutation(async ({ input, ctx }) => {
+      return ctx.db.ticket.create({ data: input });
+    }),
+
+  list: publicProcedure
+    .query(async ({ ctx }) => {
+      return ctx.db.ticket.findMany();
+    }),
+});
+```
+
+## 3. Directory Structure
+Always place files in the correct package:
+- `packages/contracts` -> Shared Zod schemas & Types
+- `packages/frontend` -> React/Vue components
+- `packages/backend` -> Node.js/tRPC server
+- `packages/core` -> Framework internals
+
+## 4. Error Handling
+When you encounter an error:
+1. **Read** the exact error message.
+2. **Locate** the file.
+3. **Check** the Zod schema if it's a type error.
+4. **Fix** the schema if needed, then the code.

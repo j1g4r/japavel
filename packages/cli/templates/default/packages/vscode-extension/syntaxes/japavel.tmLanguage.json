@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Japavel",
+  "patterns": [
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#properties"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [{
+        "name": "keyword.control.japavel",
+        "match": "\\b(Model|Fields|View|API|Relations|Hooks)\\b"
+      }, {
+        "name": "support.type.japavel",
+        "match": "\\b(string|number|boolean|date|uuid|email|url|int|json|array|enum)\\b"
+      }]
+    },
+    "strings": {
+      "name": "string.quoted.double.japavel",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.japavel",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "comments": {
+      "name": "comment.line.number-sign.japavel",
+      "match": "#.*$"
+    },
+    "properties": {
+      "name": "entity.name.tag.japavel",
+      "match": "^\\s*[a-zA-Z0-9_]+(?=:)"
+    }
+  },
+  "scopeName": "source.japavel"
+}

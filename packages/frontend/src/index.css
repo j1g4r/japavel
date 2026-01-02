@@ -1,3 +1,41 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply antialiased text-gray-900 bg-gray-50;
+    transition: background-color 0.3s ease;
+  }
+
+  /* Global kinetic defaults */
+  a, button, input, select, textarea {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
+  }
+  
+  .glass-dark {
+    @apply bg-gray-900/70 backdrop-blur-md border border-gray-800/20 shadow-xl;
+  }
+
+  .rich-card {
+    @apply bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 transition-all hover:shadow-2xl hover:-translate-y-1;
+  }
+
+  .kinetic-button {
+    @apply px-6 py-2 bg-brand text-white rounded-xl font-medium shadow-lg shadow-brand/20 transition-all hover:bg-brand-dark hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .vibrant-input {
+    @apply w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-4 focus:ring-brand/10 focus:border-brand transition-all outline-none bg-white;
+  }
+}

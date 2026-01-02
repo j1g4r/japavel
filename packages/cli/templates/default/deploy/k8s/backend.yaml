@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: japavel-backend
+  namespace: japavel
+  labels:
+    app: japavel-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: japavel-backend
+  template:
+    metadata:
+      labels:
+        app: japavel-backend
+    spec:
+      containers:
+      - name: backend
+        image: japavel/backend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: japavel-secrets
+              key: database-url
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: japavel-secrets
+              key: jwt-secret
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: japavel-backend
+  namespace: japavel
+spec:
+  selector:
+    app: japavel-backend
+  ports:
+  - port: 80
+    targetPort: 3000
+  type: ClusterIP

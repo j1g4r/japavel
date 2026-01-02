@@ -1,0 +1,5 @@
+/node_modules
+/.turbo
+/.vscode
+/docs/state/PROJECT_STATE.md
+AI_INDEX.md
