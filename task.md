@@ -1,9 +1,7 @@
 # Current Tasks
 
 ## Active Task
-- [ ] Build CLI scaffolding tools (Phase 5)
+- [x] VS Code extension for DSL
 
 ## Backlog
-- [ ] Kubernetes deployment configuration
-- [ ] Advanced monitoring dashboard
-- [ ] VS Code extension for DSL
+

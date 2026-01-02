@@ -1,2 +1,3 @@
-export declare const run: () => void;
+#!/usr/bin/env node
+export {};
 //# sourceMappingURL=cli.d.ts.map
