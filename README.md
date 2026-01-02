@@ -63,6 +63,20 @@ pnpm dev
 pnpm verify
 ```
 
+## ⌨️ CLI Usage
+
+Japavel includes a CLI to scaffold new projects.
+
+```bash
+# From the repository root
+cd packages/cli
+npm install && npm run build
+npm link
+
+# Create a new project
+japavel new my-app
+```
+
 ---
 
 ## 📄 License
