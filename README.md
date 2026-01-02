@@ -49,7 +49,7 @@ japavel/
 
 ### Installation
 ```bash
-git clone https://github.com/your-org/japavel.git
+git clone https://github.com/j1g4r/japavel.git
 cd japavel
 pnpm install
 ```
@@ -67,6 +67,3 @@ pnpm verify
 
 ## 📄 License
 MIT
-# japavel
-# japavel
-# japavel

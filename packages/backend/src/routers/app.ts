@@ -1,0 +1,16 @@
+import { router, publicProcedure } from '../trpc';
+import { UserSchema } from '@japavel/contracts';
+
+export const appRouter = router({
+  health: publicProcedure.query(() => 'ok'),
+  user: router({
+    create: publicProcedure
+      .input(UserSchema)
+      .mutation(({ input }) => {
+        // Mock DB call
+        return { id: input.id, status: 'created' };
+      }),
+  }),
+});
+
+export type AppRouter = typeof appRouter;
