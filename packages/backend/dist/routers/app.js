@@ -1,5 +1,6 @@
 import { router, publicProcedure } from '../trpc';
 import { UserSchema } from '@japavel/contracts';
+import { saasRouter } from './saas';
 export const appRouter = router({
     health: publicProcedure.query(() => 'ok'),
     user: router({
@@ -10,4 +11,5 @@ export const appRouter = router({
             return { id: input.id, status: 'created' };
         }),
     }),
+    saas: saasRouter,
 });

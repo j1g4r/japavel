@@ -1,4 +1,7 @@
-import { appRouter } from './routers/app';
+import { Application } from './Application';
 
-// Export type for frontend usage
-export type AppRouter = typeof appRouter;
+const app = new Application();
+app.boot();
+app.start(3000);
+
+export type AppRouter = any; // Placeholder until we fully migrate tRPC if keeping it

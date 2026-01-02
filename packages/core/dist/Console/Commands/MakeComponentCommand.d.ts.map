@@ -1,0 +1,1 @@
+{"version":3,"file":"MakeComponentCommand.d.ts","sourceRoot":"","sources":["../../../src/Console/Commands/MakeComponentCommand.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,eAAe,CAAC;AAIxC,qBAAa,oBAAqB,SAAQ,OAAO;IAC7C,SAAS,SAA2B;IACpC,WAAW,SAAkC;IAEvC,MAAM,CAAC,IAAI,EAAE,GAAG,EAAE,EAAE,OAAO,EAAE,GAAG,GAAG,OAAO,CAAC,IAAI,CAAC;CAmCzD"}

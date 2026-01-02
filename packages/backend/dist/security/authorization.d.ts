@@ -10,12 +10,12 @@ export declare const PermissionSchema: z.ZodObject<{
     action: z.ZodEnum<["create", "read", "update", "delete", "list", "manage", "*"]>;
     conditions: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
+    action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
     resource: string;
-    action: "create" | "read" | "update" | "delete" | "list" | "manage" | "*";
     conditions?: Record<string, unknown> | undefined;
 }, {
+    action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
     resource: string;
-    action: "create" | "read" | "update" | "delete" | "list" | "manage" | "*";
     conditions?: Record<string, unknown> | undefined;
 }>;
 export type Permission = z.infer<typeof PermissionSchema>;
@@ -28,12 +28,12 @@ export declare const RoleSchema: z.ZodObject<{
         action: z.ZodEnum<["create", "read", "update", "delete", "list", "manage", "*"]>;
         conditions: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     }, "strip", z.ZodTypeAny, {
+        action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
         resource: string;
-        action: "create" | "read" | "update" | "delete" | "list" | "manage" | "*";
         conditions?: Record<string, unknown> | undefined;
     }, {
+        action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
         resource: string;
-        action: "create" | "read" | "update" | "delete" | "list" | "manage" | "*";
         conditions?: Record<string, unknown> | undefined;
     }>, "many">;
     inherits: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -44,8 +44,8 @@ export declare const RoleSchema: z.ZodObject<{
     id: string;
     metadata: Record<string, unknown>;
     permissions: {
+        action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
         resource: string;
-        action: "create" | "read" | "update" | "delete" | "list" | "manage" | "*";
         conditions?: Record<string, unknown> | undefined;
     }[];
     inherits: string[];
@@ -55,8 +55,8 @@ export declare const RoleSchema: z.ZodObject<{
     name: string;
     id: string;
     permissions: {
+        action: "delete" | "create" | "read" | "update" | "list" | "manage" | "*";
         resource: string;
-        action: "create" | "read" | "update" | "delete" | "list" | "manage" | "*";
         conditions?: Record<string, unknown> | undefined;
     }[];
     description?: string | undefined;
@@ -77,11 +77,11 @@ export declare const PolicySchema: z.ZodObject<{
         operator: z.ZodEnum<["equals", "not_equals", "in", "not_in", "contains", "starts_with", "ends_with", "greater_than", "less_than", "matches"]>;
         value: z.ZodUnknown;
     }, "strip", z.ZodTypeAny, {
-        operator: "equals" | "not_equals" | "contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "in" | "not_in" | "matches";
+        operator: "in" | "equals" | "not_equals" | "contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "not_in" | "matches";
         field: string;
         value?: unknown;
     }, {
-        operator: "equals" | "not_equals" | "contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "in" | "not_in" | "matches";
+        operator: "in" | "equals" | "not_equals" | "contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "not_in" | "matches";
         field: string;
         value?: unknown;
     }>, "many">;
@@ -89,27 +89,27 @@ export declare const PolicySchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     name: string;
     id: string;
+    priority: number;
     conditions: {
-        operator: "equals" | "not_equals" | "contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "in" | "not_in" | "matches";
+        operator: "in" | "equals" | "not_equals" | "contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "not_in" | "matches";
         field: string;
         value?: unknown;
     }[];
     effect: "allow" | "deny";
     resources: string[];
-    actions: ("create" | "read" | "update" | "delete" | "list" | "manage" | "*")[];
-    priority: number;
+    actions: ("delete" | "create" | "read" | "update" | "list" | "manage" | "*")[];
     description?: string | undefined;
 }, {
     name: string;
     id: string;
     conditions: {
-        operator: "equals" | "not_equals" | "contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "in" | "not_in" | "matches";
+        operator: "in" | "equals" | "not_equals" | "contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "not_in" | "matches";
         field: string;
         value?: unknown;
     }[];
     effect: "allow" | "deny";
     resources: string[];
-    actions: ("create" | "read" | "update" | "delete" | "list" | "manage" | "*")[];
+    actions: ("delete" | "create" | "read" | "update" | "list" | "manage" | "*")[];
     description?: string | undefined;
     priority?: number | undefined;
 }>;

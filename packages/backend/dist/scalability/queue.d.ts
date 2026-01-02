@@ -28,10 +28,10 @@ export declare const JobSchema: z.ZodObject<{
     scheduledFor: z.ZodOptional<z.ZodDate>;
     tenantId: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    id: string;
-    status: "pending" | "cancelled" | "running" | "completed" | "failed" | "retrying";
     data: Record<string, unknown>;
+    status: "pending" | "cancelled" | "running" | "completed" | "failed" | "retrying";
     name: string;
+    id: string;
     createdAt: Date;
     queue: string;
     priority: "critical" | "low" | "normal" | "high";
@@ -48,14 +48,14 @@ export declare const JobSchema: z.ZodObject<{
     completedAt?: Date | undefined;
     scheduledFor?: Date | undefined;
 }, {
-    id: string;
     data: Record<string, unknown>;
     name: string;
+    id: string;
     createdAt: Date;
     queue: string;
-    status?: "pending" | "cancelled" | "running" | "completed" | "failed" | "retrying" | undefined;
     error?: string | undefined;
     tenantId?: string | undefined;
+    status?: "pending" | "cancelled" | "running" | "completed" | "failed" | "retrying" | undefined;
     priority?: "critical" | "low" | "normal" | "high" | undefined;
     attempts?: number | undefined;
     maxAttempts?: number | undefined;

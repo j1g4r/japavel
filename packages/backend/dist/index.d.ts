@@ -1,3 +1,2 @@
-import { appRouter } from './routers/app';
-export type AppRouter = typeof appRouter;
+export type AppRouter = any;
 //# sourceMappingURL=index.d.ts.map

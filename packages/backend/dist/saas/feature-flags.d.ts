@@ -82,18 +82,21 @@ export declare const FeatureFlagSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
-    name: string;
     type: "boolean" | "percentage" | "variant" | "allowlist" | "schedule";
     status: "active" | "inactive" | "archived";
+    name: string;
     id: string;
+    metadata: Record<string, unknown>;
+    tags: string[];
     key: string;
     defaultValue: boolean;
-    tags: string[];
-    metadata: Record<string, unknown>;
     createdAt: Date;
     updatedAt: Date;
-    percentage?: number | undefined;
     description?: string | undefined;
+    owner?: string | undefined;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
+    percentage?: number | undefined;
     variants?: {
         name: string;
         weight: number;
@@ -108,19 +111,21 @@ export declare const FeatureFlagSchema: z.ZodObject<{
         attribute: string;
         operator: "equals" | "not_equals" | "contains" | "not_contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "in_list" | "not_in_list" | "regex";
     }[] | undefined;
-    startDate?: Date | undefined;
-    endDate?: Date | undefined;
-    owner?: string | undefined;
 }, {
-    name: string;
     type: "boolean" | "percentage" | "variant" | "allowlist" | "schedule";
+    name: string;
     id: string;
     key: string;
     createdAt: Date;
     updatedAt: Date;
-    percentage?: number | undefined;
-    status?: "active" | "inactive" | "archived" | undefined;
     description?: string | undefined;
+    status?: "active" | "inactive" | "archived" | undefined;
+    metadata?: Record<string, unknown> | undefined;
+    tags?: string[] | undefined;
+    owner?: string | undefined;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
+    percentage?: number | undefined;
     defaultValue?: boolean | undefined;
     variants?: {
         name: string;
@@ -136,11 +141,6 @@ export declare const FeatureFlagSchema: z.ZodObject<{
         attribute: string;
         operator: "equals" | "not_equals" | "contains" | "not_contains" | "starts_with" | "ends_with" | "greater_than" | "less_than" | "in_list" | "not_in_list" | "regex";
     }[] | undefined;
-    startDate?: Date | undefined;
-    endDate?: Date | undefined;
-    tags?: string[] | undefined;
-    owner?: string | undefined;
-    metadata?: Record<string, unknown> | undefined;
 }>;
 export type FeatureFlag = z.infer<typeof FeatureFlagSchema>;
 export interface EvaluationContext {

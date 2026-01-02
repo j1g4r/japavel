@@ -20,8 +20,8 @@ export declare const SessionSchema: z.ZodObject<{
     metadata: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    userId: string;
     metadata: Record<string, unknown>;
+    userId: string;
     createdAt: Date;
     expiresAt: Date;
     token: string;
@@ -58,9 +58,9 @@ export declare const ApiKeySchema: z.ZodObject<{
     createdAt: z.ZodDate;
     revokedAt: z.ZodOptional<z.ZodDate>;
 }, "strip", z.ZodTypeAny, {
-    id: string;
     tenantId: string;
     name: string;
+    id: string;
     createdAt: Date;
     keyPrefix: string;
     keyHash: string;
@@ -71,9 +71,9 @@ export declare const ApiKeySchema: z.ZodObject<{
     lastUsedAt?: Date | undefined;
     revokedAt?: Date | undefined;
 }, {
-    id: string;
     tenantId: string;
     name: string;
+    id: string;
     createdAt: Date;
     keyPrefix: string;
     keyHash: string;
@@ -98,8 +98,8 @@ export declare const AuthUserSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
-    id: string;
     email: string;
+    id: string;
     createdAt: Date;
     updatedAt: Date;
     emailVerified: boolean;
@@ -110,8 +110,8 @@ export declare const AuthUserSchema: z.ZodObject<{
     lockedUntil?: Date | undefined;
     lastLoginAt?: Date | undefined;
 }, {
-    id: string;
     email: string;
+    id: string;
     createdAt: Date;
     updatedAt: Date;
     passwordHash?: string | undefined;

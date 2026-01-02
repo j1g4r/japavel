@@ -73,9 +73,11 @@ export declare const TenantSchema: z.ZodObject<{
     suspendedAt: z.ZodOptional<z.ZodDate>;
     suspendedReason: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    status: "active" | "suspended" | "pending" | "trial" | "cancelled";
     id: string;
     name: string;
+    createdAt: Date;
+    updatedAt: Date;
+    status: "active" | "suspended" | "pending" | "trial" | "cancelled";
     slug: string;
     plan: "free" | "starter" | "professional" | "enterprise" | "custom";
     settings: {
@@ -89,8 +91,6 @@ export declare const TenantSchema: z.ZodObject<{
     };
     ownerId: string;
     metadata: Record<string, unknown>;
-    createdAt: Date;
-    updatedAt: Date;
     billingEmail?: string | undefined;
     trialEndsAt?: Date | undefined;
     suspendedAt?: Date | undefined;
@@ -98,10 +98,10 @@ export declare const TenantSchema: z.ZodObject<{
 }, {
     id: string;
     name: string;
-    slug: string;
-    ownerId: string;
     createdAt: Date;
     updatedAt: Date;
+    slug: string;
+    ownerId: string;
     status?: "active" | "suspended" | "pending" | "trial" | "cancelled" | undefined;
     plan?: "free" | "starter" | "professional" | "enterprise" | "custom" | undefined;
     settings?: {
@@ -160,8 +160,8 @@ export declare const CreateTenantInputSchema: z.ZodObject<Omit<{
     suspendedAt: z.ZodOptional<z.ZodDate>;
     suspendedReason: z.ZodOptional<z.ZodString>;
 }, "id" | "createdAt" | "updatedAt" | "suspendedAt" | "suspendedReason">, "strip", z.ZodTypeAny, {
-    status: "active" | "suspended" | "pending" | "trial" | "cancelled";
     name: string;
+    status: "active" | "suspended" | "pending" | "trial" | "cancelled";
     slug: string;
     plan: "free" | "starter" | "professional" | "enterprise" | "custom";
     settings: {
@@ -198,9 +198,11 @@ export declare const CreateTenantInputSchema: z.ZodObject<Omit<{
 }>;
 export type CreateTenantInput = z.infer<typeof CreateTenantInputSchema>;
 export declare const UpdateTenantInputSchema: z.ZodObject<{
-    status: z.ZodOptional<z.ZodDefault<z.ZodEnum<["active", "suspended", "pending", "trial", "cancelled"]>>>;
     id: z.ZodString;
     name: z.ZodOptional<z.ZodString>;
+    createdAt: z.ZodOptional<z.ZodDate>;
+    updatedAt: z.ZodOptional<z.ZodDate>;
+    status: z.ZodOptional<z.ZodDefault<z.ZodEnum<["active", "suspended", "pending", "trial", "cancelled"]>>>;
     slug: z.ZodOptional<z.ZodString>;
     plan: z.ZodOptional<z.ZodDefault<z.ZodEnum<["free", "starter", "professional", "enterprise", "custom"]>>>;
     settings: z.ZodOptional<z.ZodDefault<z.ZodObject<{
@@ -231,15 +233,15 @@ export declare const UpdateTenantInputSchema: z.ZodObject<{
     ownerId: z.ZodOptional<z.ZodString>;
     billingEmail: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     metadata: z.ZodOptional<z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
-    createdAt: z.ZodOptional<z.ZodDate>;
-    updatedAt: z.ZodOptional<z.ZodDate>;
     trialEndsAt: z.ZodOptional<z.ZodOptional<z.ZodDate>>;
     suspendedAt: z.ZodOptional<z.ZodOptional<z.ZodDate>>;
     suspendedReason: z.ZodOptional<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    status?: "active" | "suspended" | "pending" | "trial" | "cancelled" | undefined;
     name?: string | undefined;
+    createdAt?: Date | undefined;
+    updatedAt?: Date | undefined;
+    status?: "active" | "suspended" | "pending" | "trial" | "cancelled" | undefined;
     slug?: string | undefined;
     plan?: "free" | "starter" | "professional" | "enterprise" | "custom" | undefined;
     settings?: {
@@ -254,15 +256,15 @@ export declare const UpdateTenantInputSchema: z.ZodObject<{
     ownerId?: string | undefined;
     billingEmail?: string | undefined;
     metadata?: Record<string, unknown> | undefined;
-    createdAt?: Date | undefined;
-    updatedAt?: Date | undefined;
     trialEndsAt?: Date | undefined;
     suspendedAt?: Date | undefined;
     suspendedReason?: string | undefined;
 }, {
     id: string;
-    status?: "active" | "suspended" | "pending" | "trial" | "cancelled" | undefined;
     name?: string | undefined;
+    createdAt?: Date | undefined;
+    updatedAt?: Date | undefined;
+    status?: "active" | "suspended" | "pending" | "trial" | "cancelled" | undefined;
     slug?: string | undefined;
     plan?: "free" | "starter" | "professional" | "enterprise" | "custom" | undefined;
     settings?: {
@@ -277,8 +279,6 @@ export declare const UpdateTenantInputSchema: z.ZodObject<{
     ownerId?: string | undefined;
     billingEmail?: string | undefined;
     metadata?: Record<string, unknown> | undefined;
-    createdAt?: Date | undefined;
-    updatedAt?: Date | undefined;
     trialEndsAt?: Date | undefined;
     suspendedAt?: Date | undefined;
     suspendedReason?: string | undefined;
@@ -298,9 +298,9 @@ export declare const TenantMemberSchema: z.ZodObject<{
     lastActiveAt: z.ZodOptional<z.ZodDate>;
 }, "strip", z.ZodTypeAny, {
     id: string;
+    role: "admin" | "owner" | "member" | "viewer" | "billing";
     tenantId: string;
     userId: string;
-    role: "owner" | "admin" | "member" | "viewer" | "billing";
     permissions: string[];
     joinedAt: Date;
     invitedBy?: string | undefined;
@@ -311,7 +311,7 @@ export declare const TenantMemberSchema: z.ZodObject<{
     tenantId: string;
     userId: string;
     joinedAt: Date;
-    role?: "owner" | "admin" | "member" | "viewer" | "billing" | undefined;
+    role?: "admin" | "owner" | "member" | "viewer" | "billing" | undefined;
     permissions?: string[] | undefined;
     invitedBy?: string | undefined;
     invitedAt?: Date | undefined;
@@ -330,23 +330,23 @@ export declare const TenantInvitationSchema: z.ZodObject<{
     createdAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
     id: string;
+    email: string;
+    role: "admin" | "owner" | "member" | "viewer" | "billing";
     createdAt: Date;
     tenantId: string;
-    role: "owner" | "admin" | "member" | "viewer" | "billing";
     invitedBy: string;
-    email: string;
     token: string;
     expiresAt: Date;
     acceptedAt?: Date | undefined;
 }, {
     id: string;
+    email: string;
     createdAt: Date;
     tenantId: string;
     invitedBy: string;
-    email: string;
     token: string;
     expiresAt: Date;
-    role?: "owner" | "admin" | "member" | "viewer" | "billing" | undefined;
+    role?: "admin" | "owner" | "member" | "viewer" | "billing" | undefined;
     acceptedAt?: Date | undefined;
 }>;
 export type TenantInvitation = z.infer<typeof TenantInvitationSchema>;
@@ -392,9 +392,11 @@ export declare const TenantContextSchema: z.ZodObject<{
         suspendedAt: z.ZodOptional<z.ZodDate>;
         suspendedReason: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        status: "active" | "suspended" | "pending" | "trial" | "cancelled";
         id: string;
         name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: "active" | "suspended" | "pending" | "trial" | "cancelled";
         slug: string;
         plan: "free" | "starter" | "professional" | "enterprise" | "custom";
         settings: {
@@ -408,8 +410,6 @@ export declare const TenantContextSchema: z.ZodObject<{
         };
         ownerId: string;
         metadata: Record<string, unknown>;
-        createdAt: Date;
-        updatedAt: Date;
         billingEmail?: string | undefined;
         trialEndsAt?: Date | undefined;
         suspendedAt?: Date | undefined;
@@ -417,10 +417,10 @@ export declare const TenantContextSchema: z.ZodObject<{
     }, {
         id: string;
         name: string;
-        slug: string;
-        ownerId: string;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        ownerId: string;
         status?: "active" | "suspended" | "pending" | "trial" | "cancelled" | undefined;
         plan?: "free" | "starter" | "professional" | "enterprise" | "custom" | undefined;
         settings?: {
@@ -444,12 +444,14 @@ export declare const TenantContextSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     tenantId: string;
     permissions: string[];
+    role?: "admin" | "owner" | "member" | "viewer" | "billing" | undefined;
     userId?: string | undefined;
-    role?: "owner" | "admin" | "member" | "viewer" | "billing" | undefined;
     tenant?: {
-        status: "active" | "suspended" | "pending" | "trial" | "cancelled";
         id: string;
         name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: "active" | "suspended" | "pending" | "trial" | "cancelled";
         slug: string;
         plan: "free" | "starter" | "professional" | "enterprise" | "custom";
         settings: {
@@ -463,8 +465,6 @@ export declare const TenantContextSchema: z.ZodObject<{
         };
         ownerId: string;
         metadata: Record<string, unknown>;
-        createdAt: Date;
-        updatedAt: Date;
         billingEmail?: string | undefined;
         trialEndsAt?: Date | undefined;
         suspendedAt?: Date | undefined;
@@ -472,16 +472,16 @@ export declare const TenantContextSchema: z.ZodObject<{
     } | undefined;
 }, {
     tenantId: string;
+    role?: "admin" | "owner" | "member" | "viewer" | "billing" | undefined;
     userId?: string | undefined;
-    role?: "owner" | "admin" | "member" | "viewer" | "billing" | undefined;
     permissions?: string[] | undefined;
     tenant?: {
         id: string;
         name: string;
-        slug: string;
-        ownerId: string;
         createdAt: Date;
         updatedAt: Date;
+        slug: string;
+        ownerId: string;
         status?: "active" | "suspended" | "pending" | "trial" | "cancelled" | undefined;
         plan?: "free" | "starter" | "professional" | "enterprise" | "custom" | undefined;
         settings?: {

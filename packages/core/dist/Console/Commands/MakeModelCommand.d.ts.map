@@ -1,0 +1,1 @@
+{"version":3,"file":"MakeModelCommand.d.ts","sourceRoot":"","sources":["../../../src/Console/Commands/MakeModelCommand.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,eAAe,CAAC;AAIxC,qBAAa,gBAAiB,SAAQ,OAAO;IACzC,SAAS,SAAuB;IAChC,WAAW,SAAmD;IAExD,MAAM,CAAC,IAAI,EAAE,GAAG,EAAE,EAAE,OAAO,EAAE,GAAG,GAAG,OAAO,CAAC,IAAI,CAAC;CAkCzD"}

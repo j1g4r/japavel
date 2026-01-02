@@ -27,12 +27,12 @@ export declare const PriceSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
-    active: boolean;
     id: string;
     name: string;
-    metadata: Record<string, unknown>;
     createdAt: Date;
     updatedAt: Date;
+    active: boolean;
+    metadata: Record<string, unknown>;
     productId: string;
     amount: number;
     currency: "USD" | "EUR" | "GBP" | "CAD" | "AUD" | "JPY";
@@ -81,13 +81,13 @@ export declare const ProductSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
-    active: boolean;
-    features: string[];
     id: string;
     name: string;
-    metadata: Record<string, unknown>;
     createdAt: Date;
     updatedAt: Date;
+    active: boolean;
+    features: string[];
+    metadata: Record<string, unknown>;
     limits: {
         users: number;
         storage: number;
@@ -132,11 +132,11 @@ export declare const SubscriptionSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
-    status: "active" | "cancelled" | "trialing" | "past_due" | "paused" | "unpaid" | "incomplete";
     id: string;
-    metadata: Record<string, unknown>;
     createdAt: Date;
     updatedAt: Date;
+    status: "active" | "cancelled" | "trialing" | "past_due" | "paused" | "unpaid" | "incomplete";
+    metadata: Record<string, unknown>;
     tenantId: string;
     productId: string;
     customerId: string;
@@ -245,11 +245,11 @@ export declare const InvoiceSchema: z.ZodObject<{
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
     number: string;
-    status: "draft" | "open" | "paid" | "void" | "uncollectible";
     id: string;
-    metadata: Record<string, unknown>;
     createdAt: Date;
     updatedAt: Date;
+    status: "draft" | "open" | "paid" | "void" | "uncollectible";
+    metadata: Record<string, unknown>;
     tenantId: string;
     currency: "USD" | "EUR" | "GBP" | "CAD" | "AUD" | "JPY";
     subtotal: number;
@@ -351,8 +351,8 @@ export declare const PaymentMethodSchema: z.ZodObject<{
             country?: string | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
-        name?: string | undefined;
         email?: string | undefined;
+        name?: string | undefined;
         phone?: string | undefined;
         address?: {
             line1?: string | undefined;
@@ -363,8 +363,8 @@ export declare const PaymentMethodSchema: z.ZodObject<{
             country?: string | undefined;
         } | undefined;
     }, {
-        name?: string | undefined;
         email?: string | undefined;
+        name?: string | undefined;
         phone?: string | undefined;
         address?: {
             line1?: string | undefined;
@@ -378,10 +378,10 @@ export declare const PaymentMethodSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
-    type: "card" | "bank_account" | "paypal" | "invoice";
     id: string;
     createdAt: Date;
     updatedAt: Date;
+    type: "card" | "bank_account" | "paypal" | "invoice";
     tenantId: string;
     isDefault: boolean;
     card?: {
@@ -391,8 +391,8 @@ export declare const PaymentMethodSchema: z.ZodObject<{
         expYear: number;
     } | undefined;
     billingDetails?: {
-        name?: string | undefined;
         email?: string | undefined;
+        name?: string | undefined;
         phone?: string | undefined;
         address?: {
             line1?: string | undefined;
@@ -404,10 +404,10 @@ export declare const PaymentMethodSchema: z.ZodObject<{
         } | undefined;
     } | undefined;
 }, {
-    type: "card" | "bank_account" | "paypal" | "invoice";
     id: string;
     createdAt: Date;
     updatedAt: Date;
+    type: "card" | "bank_account" | "paypal" | "invoice";
     tenantId: string;
     card?: {
         brand: string;
@@ -417,8 +417,8 @@ export declare const PaymentMethodSchema: z.ZodObject<{
     } | undefined;
     isDefault?: boolean | undefined;
     billingDetails?: {
-        name?: string | undefined;
         email?: string | undefined;
+        name?: string | undefined;
         phone?: string | undefined;
         address?: {
             line1?: string | undefined;
@@ -443,8 +443,8 @@ export declare const UsageRecordSchema: z.ZodObject<{
     createdAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    metadata: Record<string, unknown>;
     createdAt: Date;
+    metadata: Record<string, unknown>;
     tenantId: string;
     quantity: number;
     subscriptionId: string;
@@ -480,13 +480,13 @@ export declare const CouponSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
-    active: boolean;
-    code: string;
     id: string;
     name: string;
-    metadata: Record<string, unknown>;
     createdAt: Date;
     updatedAt: Date;
+    code: string;
+    active: boolean;
+    metadata: Record<string, unknown>;
     discountType: "percentage" | "fixed";
     discountValue: number;
     redemptionCount: number;
@@ -496,11 +496,11 @@ export declare const CouponSchema: z.ZodObject<{
     validFrom?: Date | undefined;
     validUntil?: Date | undefined;
 }, {
-    code: string;
     id: string;
     name: string;
     createdAt: Date;
     updatedAt: Date;
+    code: string;
     discountType: "percentage" | "fixed";
     discountValue: number;
     active?: boolean | undefined;

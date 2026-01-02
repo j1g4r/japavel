@@ -1,0 +1,66 @@
+/* JUI Global Primitives */
+:root {
+  --j-primary: #6366f1;
+  --j-primary-dark: #4f46e5;
+  --j-secondary: #ec4899;
+  --j-bg: #f9fafb;
+  --j-text: #111827;
+  --j-text-muted: #6b7280;
+  --j-white: #ffffff;
+  --j-radius-lg: 0.75rem;
+  --j-radius-xl: 1rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--j-bg);
+  color: var(--j-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Kinetic Utilities */
+.j-kinetic-hover {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.j-kinetic-hover:hover {
+  transform: scale(1.02);
+}
+
+.j-kinetic-hover:active {
+  transform: scale(0.98);
+}
+
+/* Glassmorphism primitives */
+.j-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Typography Gradient */
+.j-text-gradient {
+  background: linear-gradient(135deg, var(--j-primary), var(--j-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

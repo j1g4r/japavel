@@ -9,6 +9,7 @@ Japavel is a development framework designed specifically for AI agents. It inver
 ## 🚀 Key Features
 
 - **Contract-First Architecture:** Define data models once using Zod. Types, validation, and database schemas flow from this single source of truth.
+- **JUI Framework:** A custom, TypeScript-only UI framework with kinetic animations, glassmorphism, and zero reliance on CSS frameworks like Tailwind.
 - **AI Interface Layer (MCP):** Built-in Model Context Protocol server lets AI agents "plug in" to your project to read state, run tools, and debug errors.
 - **Atomic Component System:** Enforces small, single-purpose components that LLMs can easily read, understand, and modify.
 - **Self-Healing Workflows:** Integrated feedback loops that catch build errors and feed them back to the AI for automatic correction.
@@ -23,7 +24,7 @@ japavel/
 ├── .japavel/              # AI Documentation & Indexes
 ├── packages/
 │   ├── contracts/       # Shared Zod Schemas & Types (The Source of Truth)
-│   ├── frontend/        # View Layer (Atomic Components)
+│   ├── frontend/        # View Layer (JUI Framework + Core Pages)
 │   ├── backend/         # Logic Layer (tRPC + Services)
 │   ├── core/            # CLI & Generators
 │   └── mcp-server/      # AI Integration Server

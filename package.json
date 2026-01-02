@@ -9,7 +9,8 @@
     "test:all": "turbo run test",
     "lint:all": "turbo run lint",
     "clean": "turbo run clean",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "japavel": "node packages/core/dist/cli.js"
   },
   "devDependencies": {
     "turbo": "^1.12.0",

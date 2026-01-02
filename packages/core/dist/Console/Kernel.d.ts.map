@@ -1,0 +1,1 @@
+{"version":3,"file":"Kernel.d.ts","sourceRoot":"","sources":["../../src/Console/Kernel.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,OAAO,IAAI,WAAW,EAAE,MAAM,cAAc,CAAC;AAEtD,qBAAa,MAAM;IACf,OAAO,CAAC,OAAO,CAAmB;IAClC,OAAO,CAAC,QAAQ,CAAqB;;IAU9B,QAAQ,CAAC,OAAO,EAAE,WAAW;IAK7B,MAAM,CAAC,IAAI,EAAE,MAAM,EAAE;CAG/B"}
