@@ -1,0 +1,13 @@
+{
+  "name": "japavel-app",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Run dev server here'",
+    "build": "echo 'Build project here'"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
