@@ -17,7 +17,7 @@ export declare const RateLimitConfigSchema: z.ZodObject<{
     windowMs: number;
     skipFailedRequests: boolean;
     skipSuccessfulRequests: boolean;
-    keyGenerator: "ip" | "user" | "custom" | "tenant" | "api-key";
+    keyGenerator: "ip" | "tenant" | "user" | "custom" | "api-key";
     headers: boolean;
     maxRequests: number;
 }, {
@@ -25,7 +25,7 @@ export declare const RateLimitConfigSchema: z.ZodObject<{
     windowMs?: number | undefined;
     skipFailedRequests?: boolean | undefined;
     skipSuccessfulRequests?: boolean | undefined;
-    keyGenerator?: "ip" | "user" | "custom" | "tenant" | "api-key" | undefined;
+    keyGenerator?: "ip" | "tenant" | "user" | "custom" | "api-key" | undefined;
     headers?: boolean | undefined;
     maxRequests?: number | undefined;
 }>;

@@ -57,7 +57,7 @@ declare const config: {
         trustProxy: boolean;
     };
     logging: {
-        level: "info" | "debug" | "error" | "warn";
+        level: "error" | "info" | "debug" | "warn";
         maxFiles: number;
         dir: string;
         console: boolean;
@@ -65,9 +65,9 @@ declare const config: {
         maxSize: string;
     };
     mcp: {
+        port: number;
         enabled: boolean;
         allowedOrigins: string[];
-        port: number;
     };
 };
 /**
@@ -119,7 +119,7 @@ declare const _default: {
         trustProxy: boolean;
     };
     logging: {
-        level: "info" | "debug" | "error" | "warn";
+        level: "error" | "info" | "debug" | "warn";
         maxFiles: number;
         dir: string;
         console: boolean;
@@ -127,9 +127,9 @@ declare const _default: {
         maxSize: string;
     };
     mcp: {
+        port: number;
         enabled: boolean;
         allowedOrigins: string[];
-        port: number;
     };
     /**
      * Check if running in development
@@ -192,7 +192,7 @@ declare const _default: {
             trustProxy: boolean;
         };
         logging: {
-            level: "info" | "debug" | "error" | "warn";
+            level: "error" | "info" | "debug" | "warn";
             maxFiles: number;
             dir: string;
             console: boolean;
@@ -200,9 +200,9 @@ declare const _default: {
             maxSize: string;
         };
         mcp: {
+            port: number;
             enabled: boolean;
             allowedOrigins: string[];
-            port: number;
         };
     };
 };

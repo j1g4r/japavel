@@ -91,11 +91,11 @@ export declare const DataSubjectRequestSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
-    type: "access" | "rectification" | "erasure" | "portability" | "restriction" | "objection";
-    status: "pending" | "cancelled" | "completed" | "in_progress" | "rejected";
     id: string;
     userId: string;
     createdAt: Date;
+    type: "access" | "rectification" | "erasure" | "portability" | "restriction" | "objection";
+    status: "pending" | "cancelled" | "completed" | "in_progress" | "rejected";
     metadata: Record<string, unknown>;
     updatedAt: Date;
     verificationMethod: string;
@@ -108,15 +108,15 @@ export declare const DataSubjectRequestSchema: z.ZodObject<{
     response?: string | undefined;
     assignedTo?: string | undefined;
 }, {
-    type: "access" | "rectification" | "erasure" | "portability" | "restriction" | "objection";
     id: string;
     userId: string;
     createdAt: Date;
+    type: "access" | "rectification" | "erasure" | "portability" | "restriction" | "objection";
     updatedAt: Date;
     verificationMethod: string;
     deadline: Date;
-    status?: "pending" | "cancelled" | "completed" | "in_progress" | "rejected" | undefined;
     tenantId?: string | undefined;
+    status?: "pending" | "cancelled" | "completed" | "in_progress" | "rejected" | undefined;
     metadata?: Record<string, unknown> | undefined;
     description?: string | undefined;
     completedAt?: Date | undefined;

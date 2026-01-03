@@ -26,9 +26,9 @@ export declare const SessionSchema: z.ZodObject<{
     createdAt: Date;
     lastActiveAt: Date;
     metadata: Record<string, unknown>;
+    tenantId?: string | undefined;
     refreshToken?: string | undefined;
     ip?: string | undefined;
-    tenantId?: string | undefined;
     userAgent?: string | undefined;
 }, {
     id: string;
@@ -37,9 +37,9 @@ export declare const SessionSchema: z.ZodObject<{
     expiresAt: Date;
     createdAt: Date;
     lastActiveAt: Date;
+    tenantId?: string | undefined;
     refreshToken?: string | undefined;
     ip?: string | undefined;
-    tenantId?: string | undefined;
     userAgent?: string | undefined;
     metadata?: Record<string, unknown> | undefined;
 }>;
@@ -58,10 +58,10 @@ export declare const ApiKeySchema: z.ZodObject<{
     createdAt: z.ZodDate;
     revokedAt: z.ZodOptional<z.ZodDate>;
 }, "strip", z.ZodTypeAny, {
-    name: string;
     id: string;
     tenantId: string;
     createdAt: Date;
+    name: string;
     keyHash: string;
     keyPrefix: string;
     scopes: string[];
@@ -71,16 +71,16 @@ export declare const ApiKeySchema: z.ZodObject<{
     lastUsedAt?: Date | undefined;
     revokedAt?: Date | undefined;
 }, {
-    name: string;
     id: string;
     tenantId: string;
     createdAt: Date;
+    name: string;
     keyHash: string;
     keyPrefix: string;
     createdBy: string;
     expiresAt?: Date | undefined;
-    rateLimit?: number | undefined;
     scopes?: string[] | undefined;
+    rateLimit?: number | undefined;
     lastUsedAt?: Date | undefined;
     revokedAt?: Date | undefined;
 }>;
@@ -98,9 +98,9 @@ export declare const AuthUserSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, "strip", z.ZodTypeAny, {
-    email: string;
     id: string;
     createdAt: Date;
+    email: string;
     emailVerified: boolean;
     mfaEnabled: boolean;
     failedLoginAttempts: number;
@@ -110,9 +110,9 @@ export declare const AuthUserSchema: z.ZodObject<{
     lockedUntil?: Date | undefined;
     lastLoginAt?: Date | undefined;
 }, {
-    email: string;
     id: string;
     createdAt: Date;
+    email: string;
     updatedAt: Date;
     passwordHash?: string | undefined;
     emailVerified?: boolean | undefined;
@@ -234,7 +234,7 @@ export declare const getSessionManager: () => SessionManager;
  */
 export declare const initSessionManager: (redisUrl: string) => SessionManager;
 /**
- * Legacy export for backward compatibility
+ * Global session manager instance for export
  */
 export declare const sessionManager: SessionManager;
 /**

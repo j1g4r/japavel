@@ -9,13 +9,13 @@ export declare const CacheConfigSchema: z.ZodObject<{
     keyPrefix: z.ZodDefault<z.ZodString>;
     serializer: z.ZodDefault<z.ZodEnum<["json", "msgpack"]>>;
 }, "strip", z.ZodTypeAny, {
-    maxSize: number;
     keyPrefix: string;
+    maxSize: number;
     defaultTTL: number;
     serializer: "json" | "msgpack";
 }, {
-    maxSize?: number | undefined;
     keyPrefix?: string | undefined;
+    maxSize?: number | undefined;
     defaultTTL?: number | undefined;
     serializer?: "json" | "msgpack" | undefined;
 }>;
@@ -28,17 +28,17 @@ export declare const CacheEntrySchema: z.ZodObject<{
     expiresAt: z.ZodOptional<z.ZodNumber>;
     tags: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
-    key: string;
     createdAt: number;
+    key: string;
     tags: string[];
-    value?: unknown;
     expiresAt?: number | undefined;
+    value?: unknown;
     ttl?: number | undefined;
 }, {
-    key: string;
     createdAt: number;
-    value?: unknown;
+    key: string;
     expiresAt?: number | undefined;
+    value?: unknown;
     tags?: string[] | undefined;
     ttl?: number | undefined;
 }>;

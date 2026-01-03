@@ -4,6 +4,12 @@
 - **Objective**: Add app CSS guideline for Front-End development.
 - **Phase**: Planning / Documentation.
 
+## Technology Stack
+- **Backend**: Node.js, Express, tRPC, PostgreSQL, Redis.
+- **Frontend**: TypeScript, JUI, Tailwind.
+- **Protocol**: Zod Contract-First.
+
+
 ## Progress Checklist
 - [x] Initial Task Setup
 - [x] Guideline Definition

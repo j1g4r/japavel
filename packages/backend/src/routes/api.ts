@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AuthController } from "../Http/Controllers/AuthController";
+import { AuthController } from "../controllers/AuthController";
 import {
   securityHeaders,
   corsConfig,

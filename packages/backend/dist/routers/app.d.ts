@@ -192,33 +192,33 @@ export declare const appRouter: import("@trpc/server").CreateRouterInner<import(
             _output_out: typeof import("@trpc/server").unsetMarker;
         }, {
             items: {
-                timestamp: Date;
                 id: string;
                 metadata: Record<string, unknown>;
+                timestamp: Date;
                 action: string;
                 description: string;
                 actor: {
                     type: "user" | "system" | "service" | "anonymous";
-                    email?: string | undefined;
-                    name?: string | undefined;
-                    ip?: string | undefined;
                     id?: string | undefined;
+                    ip?: string | undefined;
                     userAgent?: string | undefined;
+                    name?: string | undefined;
+                    email?: string | undefined;
                 };
-                category: "security" | "data" | "access" | "admin" | "billing" | "auth" | "integration" | "system";
-                severity: "info" | "error" | "warning" | "critical";
+                category: "access" | "security" | "data" | "admin" | "billing" | "auth" | "integration" | "system";
+                severity: "error" | "info" | "warning" | "critical";
                 outcome: "pending" | "success" | "failure" | "partial";
                 tags: string[];
                 tenantId?: string | undefined;
                 resource?: {
-                    type: string;
                     id: string;
+                    type: string;
                     name?: string | undefined;
                 } | undefined;
                 changes?: {
+                    fields?: string[] | undefined;
                     before?: Record<string, unknown> | undefined;
                     after?: Record<string, unknown> | undefined;
-                    fields?: string[] | undefined;
                 } | undefined;
                 context?: {
                     sessionId?: string | undefined;

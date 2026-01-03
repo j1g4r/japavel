@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { Controller } from "./Controller";
-import { prisma } from "../../Models/Model";
+import { prisma } from "../Models/Model";
 import {
   passwordUtils,
   sessionManager,
   loginRateLimiter,
-} from "../../security/auth";
+} from "../security/auth";
 import { z } from "zod";
-import logger from "../../Support/logger";
+import logger from "../utils/logger";
 
 /**
  * Authentication Controller

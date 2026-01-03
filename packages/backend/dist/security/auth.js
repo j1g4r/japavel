@@ -329,7 +329,7 @@ export const initSessionManager = (redisUrl) => {
     return sessionManagerInstance;
 };
 /**
- * Legacy export for backward compatibility
+ * Global session manager instance for export
  */
 export const sessionManager = getSessionManager();
 /**

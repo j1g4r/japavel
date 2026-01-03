@@ -22,18 +22,18 @@ export declare const AuditEventSchema: z.ZodObject<{
         userAgent: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         type: "user" | "system" | "service" | "anonymous";
-        email?: string | undefined;
-        name?: string | undefined;
-        ip?: string | undefined;
         id?: string | undefined;
+        ip?: string | undefined;
         userAgent?: string | undefined;
+        name?: string | undefined;
+        email?: string | undefined;
     }, {
         type: "user" | "system" | "service" | "anonymous";
-        email?: string | undefined;
-        name?: string | undefined;
-        ip?: string | undefined;
         id?: string | undefined;
+        ip?: string | undefined;
         userAgent?: string | undefined;
+        name?: string | undefined;
+        email?: string | undefined;
     }>;
     category: z.ZodEnum<["auth", "access", "data", "admin", "billing", "security", "integration", "system"]>;
     action: z.ZodString;
@@ -45,12 +45,12 @@ export declare const AuditEventSchema: z.ZodObject<{
         id: z.ZodString;
         name: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        type: string;
         id: string;
+        type: string;
         name?: string | undefined;
     }, {
-        type: string;
         id: string;
+        type: string;
         name?: string | undefined;
     }>>;
     changes: z.ZodOptional<z.ZodObject<{
@@ -58,13 +58,13 @@ export declare const AuditEventSchema: z.ZodObject<{
         after: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
         fields: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
+        fields?: string[] | undefined;
         before?: Record<string, unknown> | undefined;
         after?: Record<string, unknown> | undefined;
-        fields?: string[] | undefined;
     }, {
+        fields?: string[] | undefined;
         before?: Record<string, unknown> | undefined;
         after?: Record<string, unknown> | undefined;
-        fields?: string[] | undefined;
     }>>;
     context: z.ZodOptional<z.ZodObject<{
         requestId: z.ZodOptional<z.ZodString>;
@@ -108,33 +108,33 @@ export declare const AuditEventSchema: z.ZodObject<{
     metadata: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     tags: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
-    timestamp: Date;
     id: string;
     metadata: Record<string, unknown>;
+    timestamp: Date;
     action: string;
     description: string;
     actor: {
         type: "user" | "system" | "service" | "anonymous";
-        email?: string | undefined;
-        name?: string | undefined;
-        ip?: string | undefined;
         id?: string | undefined;
+        ip?: string | undefined;
         userAgent?: string | undefined;
+        name?: string | undefined;
+        email?: string | undefined;
     };
-    category: "security" | "data" | "access" | "admin" | "billing" | "auth" | "integration" | "system";
-    severity: "info" | "error" | "warning" | "critical";
+    category: "access" | "security" | "data" | "admin" | "billing" | "auth" | "integration" | "system";
+    severity: "error" | "info" | "warning" | "critical";
     outcome: "pending" | "success" | "failure" | "partial";
     tags: string[];
     tenantId?: string | undefined;
     resource?: {
-        type: string;
         id: string;
+        type: string;
         name?: string | undefined;
     } | undefined;
     changes?: {
+        fields?: string[] | undefined;
         before?: Record<string, unknown> | undefined;
         after?: Record<string, unknown> | undefined;
-        fields?: string[] | undefined;
     } | undefined;
     context?: {
         sessionId?: string | undefined;
@@ -148,32 +148,32 @@ export declare const AuditEventSchema: z.ZodObject<{
         } | undefined;
     } | undefined;
 }, {
-    timestamp: Date;
     id: string;
+    timestamp: Date;
     action: string;
     description: string;
     actor: {
         type: "user" | "system" | "service" | "anonymous";
-        email?: string | undefined;
-        name?: string | undefined;
-        ip?: string | undefined;
         id?: string | undefined;
+        ip?: string | undefined;
         userAgent?: string | undefined;
+        name?: string | undefined;
+        email?: string | undefined;
     };
-    category: "security" | "data" | "access" | "admin" | "billing" | "auth" | "integration" | "system";
+    category: "access" | "security" | "data" | "admin" | "billing" | "auth" | "integration" | "system";
     tenantId?: string | undefined;
     metadata?: Record<string, unknown> | undefined;
-    severity?: "info" | "error" | "warning" | "critical" | undefined;
+    severity?: "error" | "info" | "warning" | "critical" | undefined;
     outcome?: "pending" | "success" | "failure" | "partial" | undefined;
     resource?: {
-        type: string;
         id: string;
+        type: string;
         name?: string | undefined;
     } | undefined;
     changes?: {
+        fields?: string[] | undefined;
         before?: Record<string, unknown> | undefined;
         after?: Record<string, unknown> | undefined;
-        fields?: string[] | undefined;
     } | undefined;
     context?: {
         sessionId?: string | undefined;

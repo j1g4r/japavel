@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import Redis from "ioredis";
 import apiRouter from "./routes/api";
 import { securityHeaders, corsConfig, apiRateLimiter, logRequest, logResponse, errorHandler, notFoundHandler, healthCheck, } from "./middleware";
-import logger from "./Support/logger";
+import logger from "./utils/logger";
 import config from "./config/env";
 import { getSessionManager } from "./security/auth";
 /**

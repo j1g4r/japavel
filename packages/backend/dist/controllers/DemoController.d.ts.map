@@ -1,0 +1,1 @@
+{"version":3,"file":"DemoController.d.ts","sourceRoot":"","sources":["../../src/controllers/DemoController.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAC5C,OAAO,EAAE,UAAU,EAAE,MAAM,cAAc,CAAC;AAE1C,qBAAa,cAAe,SAAQ,UAAU;WAC7B,KAAK,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ;CAGjD"}
