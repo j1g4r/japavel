@@ -23,6 +23,7 @@ export class AuthController extends Controller {
       .string()
       .min(8, "Password must be at least 8 characters")
       .max(128),
+    rememberMe: z.boolean().default(false).optional(),
   });
 
   private static readonly RegisterSchema = z.object({
@@ -313,12 +314,14 @@ export class AuthController extends Controller {
       loginRateLimiter.reset(email);
 
       // Create session
+      const rememberMe = result.data.rememberMe ?? false;
       const session = await sessionManager.create(user.id, {
-        expiresIn: 3600 * 24, // 24 hours
+        expiresIn: rememberMe ? 3600 * 12 : 3600 * 24, // 12 hours if remember me, else 24 hours
         ip: AuthController.getClientIp(req),
         userAgent: req.headers["user-agent"],
         metadata: {
           method: "login",
+          rememberMe,
         },
       });
 
@@ -414,7 +417,9 @@ export class AuthController extends Controller {
       const allSessions = await sessionManager.getUserSessions(
         (req as any).user?.id,
       );
-      const session = allSessions.find((s: any) => s.refreshToken === refreshToken);
+      const session = allSessions.find(
+        (s: any) => s.refreshToken === refreshToken,
+      );
 
       if (!session || !session.refreshToken) {
         logger.warn("Token refresh failed - invalid refresh token", {
