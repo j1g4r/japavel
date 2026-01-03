@@ -410,14 +410,9 @@ export const initSessionManager = (redisUrl: string): SessionManager => {
 };
 
 /**
- * Legacy export for backward compatibility
+ * Global session manager instance for export
  */
-// Lazy getter for backward compatibility - only initializes when accessed
-Object.defineProperty(exports, "sessionManager", {
-  get: () => getSessionManager(),
-  enumerable: true,
-  configurable: false,
-});
+export const sessionManager = getSessionManager();
 
 /**
  * Authentication middleware

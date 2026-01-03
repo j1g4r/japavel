@@ -1,4 +1,13 @@
-export { default as JButton } from './JButton.vue';
-export { default as JInput } from './JInput.vue';
-export { default as JCard } from './JCard.vue';
-export { default as JLayout } from './JLayout.vue';
+export { default as JBadge } from './JBadge';
+export { default as JAlert } from './JAlert';
+export { default as JButton } from './JButton';
+export { default as JCard } from './JCard';
+export { default as JInput } from './JInput';
+export { default as JLayout } from './JLayout';
+export { default as JNavbar } from './JNavbar';
+export { default as JToggle } from './JToggle';
+export { default as JSelect } from './JSelect';
+export { default as JModal } from './JModal';
+export { default as JAvatar } from './JAvatar';
+export { default as JDropdown } from './JDropdown';
+export { default as JTable } from './JTable';

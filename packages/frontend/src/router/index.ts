@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Welcome from '../views/Welcome.vue'
-import Login from '../views/Login.vue'
-import Register from '../views/Register.vue'
-import Dashboard from '../views/Dashboard.vue'
-import Settings from '../views/Settings.vue'
-import ComponentShowcase from '../views/ComponentShowcase.vue'
+import Welcome from '../views/Welcome'
+import Login from '../views/Login'
+import Register from '../views/Register'
+import Dashboard from '../views/Dashboard'
+import Analytics from '../views/Analytics'
+import Users from '../views/Users'
+import Settings from '../views/Settings'
+import ComponentShowcase from '../views/ComponentShowcase'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +30,16 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: Dashboard
+    },
+    {
+      path: '/analytics',
+      name: 'analytics',
+      component: Analytics
+    },
+    {
+      path: '/users',
+      name: 'users',
+      component: Users
     },
     {
       path: '/settings',

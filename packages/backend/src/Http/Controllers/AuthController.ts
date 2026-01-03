@@ -414,7 +414,7 @@ export class AuthController extends Controller {
       const allSessions = await sessionManager.getUserSessions(
         (req as any).user?.id,
       );
-      const session = allSessions.find((s) => s.refreshToken === refreshToken);
+      const session = allSessions.find((s: any) => s.refreshToken === refreshToken);
 
       if (!session || !session.refreshToken) {
         logger.warn("Token refresh failed - invalid refresh token", {
