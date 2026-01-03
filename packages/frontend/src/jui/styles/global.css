@@ -18,7 +18,12 @@
 }
 
 body {
-  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Outfit",
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   background-color: var(--j-bg);
   color: var(--j-text);
   line-height: 1.5;
@@ -59,6 +64,7 @@ button {
 
 /* Typography Gradient */
 .j-text-gradient {
+  color: var(--j-primary);
   background: linear-gradient(135deg, var(--j-primary), var(--j-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

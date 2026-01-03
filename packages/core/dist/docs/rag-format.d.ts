@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 /**
  * RAG-Ready Documentation Format
  * Structured documentation optimized for Retrieval-Augmented Generation
@@ -6,34 +6,24 @@ import { z } from 'zod';
 export declare const DocumentMetadataSchema: z.ZodObject<{
     id: z.ZodString;
     title: z.ZodString;
-    type: z.ZodEnum<["api", "component", "schema", "guide", "pattern", "pitfall", "example", "architecture", "troubleshooting"]>;
-    tags: z.ZodArray<z.ZodString, "many">;
+    type: z.ZodEnum<{
+        api: "api";
+        component: "component";
+        schema: "schema";
+        guide: "guide";
+        pattern: "pattern";
+        pitfall: "pitfall";
+        example: "example";
+        architecture: "architecture";
+        troubleshooting: "troubleshooting";
+    }>;
+    tags: z.ZodArray<z.ZodString>;
     created: z.ZodString;
     updated: z.ZodString;
     version: z.ZodString;
     source: z.ZodOptional<z.ZodString>;
-    relatedDocs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
-}, "strip", z.ZodTypeAny, {
-    type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-    id: string;
-    title: string;
-    tags: string[];
-    created: string;
-    updated: string;
-    version: string;
-    relatedDocs: string[];
-    source?: string | undefined;
-}, {
-    type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-    id: string;
-    title: string;
-    tags: string[];
-    created: string;
-    updated: string;
-    version: string;
-    source?: string | undefined;
-    relatedDocs?: string[] | undefined;
-}>;
+    relatedDocs: z.ZodDefault<z.ZodArray<z.ZodString>>;
+}, z.core.$strip>;
 export type DocumentMetadata = z.infer<typeof DocumentMetadataSchema>;
 export declare const DocumentSectionSchema: z.ZodObject<{
     id: z.ZodString;
@@ -45,76 +35,32 @@ export declare const DocumentSectionSchema: z.ZodObject<{
         code: z.ZodString;
         filename: z.ZodOptional<z.ZodString>;
         description: z.ZodOptional<z.ZodString>;
-    }, "strip", z.ZodTypeAny, {
-        code: string;
-        language: string;
-        description?: string | undefined;
-        filename?: string | undefined;
-    }, {
-        code: string;
-        language: string;
-        description?: string | undefined;
-        filename?: string | undefined;
-    }>, "many">>;
-    keywords: z.ZodArray<z.ZodString, "many">;
-}, "strip", z.ZodTypeAny, {
-    id: string;
-    heading: string;
-    level: number;
-    content: string;
-    codeBlocks: {
-        code: string;
-        language: string;
-        description?: string | undefined;
-        filename?: string | undefined;
-    }[];
-    keywords: string[];
-}, {
-    id: string;
-    heading: string;
-    level: number;
-    content: string;
-    keywords: string[];
-    codeBlocks?: {
-        code: string;
-        language: string;
-        description?: string | undefined;
-        filename?: string | undefined;
-    }[] | undefined;
-}>;
+    }, z.core.$strip>>>;
+    keywords: z.ZodArray<z.ZodString>;
+}, z.core.$strip>;
 export type DocumentSection = z.infer<typeof DocumentSectionSchema>;
 export declare const RAGDocumentSchema: z.ZodObject<{
     metadata: z.ZodObject<{
         id: z.ZodString;
         title: z.ZodString;
-        type: z.ZodEnum<["api", "component", "schema", "guide", "pattern", "pitfall", "example", "architecture", "troubleshooting"]>;
-        tags: z.ZodArray<z.ZodString, "many">;
+        type: z.ZodEnum<{
+            api: "api";
+            component: "component";
+            schema: "schema";
+            guide: "guide";
+            pattern: "pattern";
+            pitfall: "pitfall";
+            example: "example";
+            architecture: "architecture";
+            troubleshooting: "troubleshooting";
+        }>;
+        tags: z.ZodArray<z.ZodString>;
         created: z.ZodString;
         updated: z.ZodString;
         version: z.ZodString;
         source: z.ZodOptional<z.ZodString>;
-        relatedDocs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
-    }, "strip", z.ZodTypeAny, {
-        type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-        id: string;
-        title: string;
-        tags: string[];
-        created: string;
-        updated: string;
-        version: string;
-        relatedDocs: string[];
-        source?: string | undefined;
-    }, {
-        type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-        id: string;
-        title: string;
-        tags: string[];
-        created: string;
-        updated: string;
-        version: string;
-        source?: string | undefined;
-        relatedDocs?: string[] | undefined;
-    }>;
+        relatedDocs: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    }, z.core.$strip>;
     summary: z.ZodString;
     sections: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
@@ -126,127 +72,17 @@ export declare const RAGDocumentSchema: z.ZodObject<{
             code: z.ZodString;
             filename: z.ZodOptional<z.ZodString>;
             description: z.ZodOptional<z.ZodString>;
-        }, "strip", z.ZodTypeAny, {
-            code: string;
-            language: string;
-            description?: string | undefined;
-            filename?: string | undefined;
-        }, {
-            code: string;
-            language: string;
-            description?: string | undefined;
-            filename?: string | undefined;
-        }>, "many">>;
-        keywords: z.ZodArray<z.ZodString, "many">;
-    }, "strip", z.ZodTypeAny, {
-        id: string;
-        heading: string;
-        level: number;
-        content: string;
-        codeBlocks: {
-            code: string;
-            language: string;
-            description?: string | undefined;
-            filename?: string | undefined;
-        }[];
-        keywords: string[];
-    }, {
-        id: string;
-        heading: string;
-        level: number;
-        content: string;
-        keywords: string[];
-        codeBlocks?: {
-            code: string;
-            language: string;
-            description?: string | undefined;
-            filename?: string | undefined;
-        }[] | undefined;
-    }>, "many">;
-    embeddings: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodArray<z.ZodNumber, "many">>>;
+        }, z.core.$strip>>>;
+        keywords: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>>;
+    embeddings: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodArray<z.ZodNumber>>>;
     searchIndex: z.ZodObject<{
-        keywords: z.ZodArray<z.ZodString, "many">;
-        concepts: z.ZodArray<z.ZodString, "many">;
-        technologies: z.ZodArray<z.ZodString, "many">;
-        problemsDomain: z.ZodArray<z.ZodString, "many">;
-    }, "strip", z.ZodTypeAny, {
-        keywords: string[];
-        concepts: string[];
-        technologies: string[];
-        problemsDomain: string[];
-    }, {
-        keywords: string[];
-        concepts: string[];
-        technologies: string[];
-        problemsDomain: string[];
-    }>;
-}, "strip", z.ZodTypeAny, {
-    summary: string;
-    metadata: {
-        type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-        id: string;
-        title: string;
-        tags: string[];
-        created: string;
-        updated: string;
-        version: string;
-        relatedDocs: string[];
-        source?: string | undefined;
-    };
-    sections: {
-        id: string;
-        heading: string;
-        level: number;
-        content: string;
-        codeBlocks: {
-            code: string;
-            language: string;
-            description?: string | undefined;
-            filename?: string | undefined;
-        }[];
-        keywords: string[];
-    }[];
-    searchIndex: {
-        keywords: string[];
-        concepts: string[];
-        technologies: string[];
-        problemsDomain: string[];
-    };
-    embeddings?: Record<string, number[]> | undefined;
-}, {
-    summary: string;
-    metadata: {
-        type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-        id: string;
-        title: string;
-        tags: string[];
-        created: string;
-        updated: string;
-        version: string;
-        source?: string | undefined;
-        relatedDocs?: string[] | undefined;
-    };
-    sections: {
-        id: string;
-        heading: string;
-        level: number;
-        content: string;
-        keywords: string[];
-        codeBlocks?: {
-            code: string;
-            language: string;
-            description?: string | undefined;
-            filename?: string | undefined;
-        }[] | undefined;
-    }[];
-    searchIndex: {
-        keywords: string[];
-        concepts: string[];
-        technologies: string[];
-        problemsDomain: string[];
-    };
-    embeddings?: Record<string, number[]> | undefined;
-}>;
+        keywords: z.ZodArray<z.ZodString>;
+        concepts: z.ZodArray<z.ZodString>;
+        technologies: z.ZodArray<z.ZodString>;
+        problemsDomain: z.ZodArray<z.ZodString>;
+    }, z.core.$strip>;
+}, z.core.$strip>;
 export type RAGDocument = z.infer<typeof RAGDocumentSchema>;
 export declare const DocumentCollectionSchema: z.ZodObject<{
     name: z.ZodString;
@@ -256,34 +92,24 @@ export declare const DocumentCollectionSchema: z.ZodObject<{
         metadata: z.ZodObject<{
             id: z.ZodString;
             title: z.ZodString;
-            type: z.ZodEnum<["api", "component", "schema", "guide", "pattern", "pitfall", "example", "architecture", "troubleshooting"]>;
-            tags: z.ZodArray<z.ZodString, "many">;
+            type: z.ZodEnum<{
+                api: "api";
+                component: "component";
+                schema: "schema";
+                guide: "guide";
+                pattern: "pattern";
+                pitfall: "pitfall";
+                example: "example";
+                architecture: "architecture";
+                troubleshooting: "troubleshooting";
+            }>;
+            tags: z.ZodArray<z.ZodString>;
             created: z.ZodString;
             updated: z.ZodString;
             version: z.ZodString;
             source: z.ZodOptional<z.ZodString>;
-            relatedDocs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
-        }, "strip", z.ZodTypeAny, {
-            type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-            id: string;
-            title: string;
-            tags: string[];
-            created: string;
-            updated: string;
-            version: string;
-            relatedDocs: string[];
-            source?: string | undefined;
-        }, {
-            type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-            id: string;
-            title: string;
-            tags: string[];
-            created: string;
-            updated: string;
-            version: string;
-            source?: string | undefined;
-            relatedDocs?: string[] | undefined;
-        }>;
+            relatedDocs: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        }, z.core.$strip>;
         summary: z.ZodString;
         sections: z.ZodArray<z.ZodObject<{
             id: z.ZodString;
@@ -295,207 +121,19 @@ export declare const DocumentCollectionSchema: z.ZodObject<{
                 code: z.ZodString;
                 filename: z.ZodOptional<z.ZodString>;
                 description: z.ZodOptional<z.ZodString>;
-            }, "strip", z.ZodTypeAny, {
-                code: string;
-                language: string;
-                description?: string | undefined;
-                filename?: string | undefined;
-            }, {
-                code: string;
-                language: string;
-                description?: string | undefined;
-                filename?: string | undefined;
-            }>, "many">>;
-            keywords: z.ZodArray<z.ZodString, "many">;
-        }, "strip", z.ZodTypeAny, {
-            id: string;
-            heading: string;
-            level: number;
-            content: string;
-            codeBlocks: {
-                code: string;
-                language: string;
-                description?: string | undefined;
-                filename?: string | undefined;
-            }[];
-            keywords: string[];
-        }, {
-            id: string;
-            heading: string;
-            level: number;
-            content: string;
-            keywords: string[];
-            codeBlocks?: {
-                code: string;
-                language: string;
-                description?: string | undefined;
-                filename?: string | undefined;
-            }[] | undefined;
-        }>, "many">;
-        embeddings: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodArray<z.ZodNumber, "many">>>;
+            }, z.core.$strip>>>;
+            keywords: z.ZodArray<z.ZodString>;
+        }, z.core.$strip>>;
+        embeddings: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodArray<z.ZodNumber>>>;
         searchIndex: z.ZodObject<{
-            keywords: z.ZodArray<z.ZodString, "many">;
-            concepts: z.ZodArray<z.ZodString, "many">;
-            technologies: z.ZodArray<z.ZodString, "many">;
-            problemsDomain: z.ZodArray<z.ZodString, "many">;
-        }, "strip", z.ZodTypeAny, {
-            keywords: string[];
-            concepts: string[];
-            technologies: string[];
-            problemsDomain: string[];
-        }, {
-            keywords: string[];
-            concepts: string[];
-            technologies: string[];
-            problemsDomain: string[];
-        }>;
-    }, "strip", z.ZodTypeAny, {
-        summary: string;
-        metadata: {
-            type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-            id: string;
-            title: string;
-            tags: string[];
-            created: string;
-            updated: string;
-            version: string;
-            relatedDocs: string[];
-            source?: string | undefined;
-        };
-        sections: {
-            id: string;
-            heading: string;
-            level: number;
-            content: string;
-            codeBlocks: {
-                code: string;
-                language: string;
-                description?: string | undefined;
-                filename?: string | undefined;
-            }[];
-            keywords: string[];
-        }[];
-        searchIndex: {
-            keywords: string[];
-            concepts: string[];
-            technologies: string[];
-            problemsDomain: string[];
-        };
-        embeddings?: Record<string, number[]> | undefined;
-    }, {
-        summary: string;
-        metadata: {
-            type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-            id: string;
-            title: string;
-            tags: string[];
-            created: string;
-            updated: string;
-            version: string;
-            source?: string | undefined;
-            relatedDocs?: string[] | undefined;
-        };
-        sections: {
-            id: string;
-            heading: string;
-            level: number;
-            content: string;
-            keywords: string[];
-            codeBlocks?: {
-                code: string;
-                language: string;
-                description?: string | undefined;
-                filename?: string | undefined;
-            }[] | undefined;
-        }[];
-        searchIndex: {
-            keywords: string[];
-            concepts: string[];
-            technologies: string[];
-            problemsDomain: string[];
-        };
-        embeddings?: Record<string, number[]> | undefined;
-    }>, "many">;
-    index: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString, "many">>;
-}, "strip", z.ZodTypeAny, {
-    name: string;
-    version: string;
-    lastUpdated: string;
-    documents: {
-        summary: string;
-        metadata: {
-            type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-            id: string;
-            title: string;
-            tags: string[];
-            created: string;
-            updated: string;
-            version: string;
-            relatedDocs: string[];
-            source?: string | undefined;
-        };
-        sections: {
-            id: string;
-            heading: string;
-            level: number;
-            content: string;
-            codeBlocks: {
-                code: string;
-                language: string;
-                description?: string | undefined;
-                filename?: string | undefined;
-            }[];
-            keywords: string[];
-        }[];
-        searchIndex: {
-            keywords: string[];
-            concepts: string[];
-            technologies: string[];
-            problemsDomain: string[];
-        };
-        embeddings?: Record<string, number[]> | undefined;
-    }[];
-    index: Record<string, string[]>;
-}, {
-    name: string;
-    version: string;
-    lastUpdated: string;
-    documents: {
-        summary: string;
-        metadata: {
-            type: "pattern" | "api" | "component" | "schema" | "guide" | "pitfall" | "example" | "architecture" | "troubleshooting";
-            id: string;
-            title: string;
-            tags: string[];
-            created: string;
-            updated: string;
-            version: string;
-            source?: string | undefined;
-            relatedDocs?: string[] | undefined;
-        };
-        sections: {
-            id: string;
-            heading: string;
-            level: number;
-            content: string;
-            keywords: string[];
-            codeBlocks?: {
-                code: string;
-                language: string;
-                description?: string | undefined;
-                filename?: string | undefined;
-            }[] | undefined;
-        }[];
-        searchIndex: {
-            keywords: string[];
-            concepts: string[];
-            technologies: string[];
-            problemsDomain: string[];
-        };
-        embeddings?: Record<string, number[]> | undefined;
-    }[];
-    index: Record<string, string[]>;
-}>;
+            keywords: z.ZodArray<z.ZodString>;
+            concepts: z.ZodArray<z.ZodString>;
+            technologies: z.ZodArray<z.ZodString>;
+            problemsDomain: z.ZodArray<z.ZodString>;
+        }, z.core.$strip>;
+    }, z.core.$strip>>;
+    index: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString>>;
+}, z.core.$strip>;
 export type DocumentCollection = z.infer<typeof DocumentCollectionSchema>;
 /**
  * RAG Document Builder
@@ -508,7 +146,7 @@ export declare class RAGDocumentBuilder {
     /**
      * Set document metadata
      */
-    setMetadata(metadata: Partial<Omit<DocumentMetadata, 'id' | 'created' | 'updated'>>): this;
+    setMetadata(metadata: Partial<Omit<DocumentMetadata, "id" | "created" | "updated">>): this;
     /**
      * Set document summary
      */
@@ -516,7 +154,7 @@ export declare class RAGDocumentBuilder {
     /**
      * Add a section
      */
-    addSection(section: Omit<DocumentSection, 'id'>): this;
+    addSection(section: Omit<DocumentSection, "id">): this;
     /**
      * Add search keywords
      */
@@ -565,7 +203,7 @@ export declare class DocumentCollectionManager {
      * Search documents
      */
     search(query: string, options?: {
-        type?: DocumentMetadata['type'];
+        type?: DocumentMetadata["type"];
         tags?: string[];
         limit?: number;
     }): RAGDocument[];
@@ -576,7 +214,7 @@ export declare class DocumentCollectionManager {
     /**
      * Get documents by type
      */
-    getByType(type: DocumentMetadata['type']): RAGDocument[];
+    getByType(type: DocumentMetadata["type"]): RAGDocument[];
     /**
      * Get related documents
      */

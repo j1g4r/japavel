@@ -1,4 +1,11 @@
-import { JapavelSchema, getNormalizedFields, FieldDefinition, ApiConfig, ViewConfig } from './parser';
+import {
+  JapavelSchema,
+  getNormalizedFields,
+  FieldDefinition,
+  ApiConfig,
+  ViewConfig,
+  Relationship,
+} from "./parser";
 
 /**
  * Code Generator - Transforms JapavelSchema DSL to TypeScript/Prisma code
@@ -34,7 +41,7 @@ export const generateZodSchema = (schema: JapavelSchema): string => {
 
   const fieldLines = Object.entries(fields)
     .map(([name, field]) => `  ${name}: ${fieldToZod(field)},`)
-    .join('\n');
+    .join("\n");
 
   return `import { z } from 'zod';
 
@@ -82,64 +89,63 @@ function fieldToZod(field: FieldDefinition): string {
   let zodType: string;
 
   switch (field.type) {
-    case 'string':
-      zodType = 'z.string()';
+    case "string":
+      zodType = "z.string()";
       if (field.minLength) zodType += `.min(${field.minLength})`;
       if (field.maxLength) zodType += `.max(${field.maxLength})`;
       if (field.pattern) zodType += `.regex(/${field.pattern}/)`;
       break;
-    case 'number':
-      zodType = 'z.number()';
+    case "number":
+      zodType = "z.number()";
       if (field.min !== undefined) zodType += `.min(${field.min})`;
       if (field.max !== undefined) zodType += `.max(${field.max})`;
       break;
-    case 'int':
-      zodType = 'z.number().int()';
+    case "int":
+      zodType = "z.number().int()";
       if (field.min !== undefined) zodType += `.min(${field.min})`;
       if (field.max !== undefined) zodType += `.max(${field.max})`;
       break;
-    case 'boolean':
-      zodType = 'z.boolean()';
+    case "boolean":
+      zodType = "z.boolean()";
       break;
-    case 'date':
-      zodType = 'z.date()';
+    case "date":
+      zodType = "z.date()";
       break;
-    case 'uuid':
-      zodType = 'z.string().uuid()';
+    case "uuid":
+      zodType = "z.string().uuid()";
       break;
-    case 'email':
-      zodType = 'z.string().email()';
+    case "email":
+      zodType = "z.string().email()";
       break;
-    case 'url':
-      zodType = 'z.string().url()';
+    case "url":
+      zodType = "z.string().url()";
       break;
-    case 'json':
-      zodType = 'z.record(z.unknown())';
+    case "json":
+      zodType = "z.record(z.unknown())";
       break;
-    case 'array':
-      const itemType = field.items || 'string';
+    case "array":
+      const itemType = field.items || "string";
       zodType = `z.array(z.${itemType}())`;
       break;
-    case 'enum':
+    case "enum":
       if (field.enum && field.enum.length > 0) {
-        const enumValues = field.enum.map(v => `'${v}'`).join(', ');
+        const enumValues = field.enum.map((v) => `'${v}'`).join(", ");
         zodType = `z.enum([${enumValues}])`;
       } else {
-        zodType = 'z.string()';
+        zodType = "z.string()";
       }
       break;
     default:
-      zodType = 'z.unknown()';
+      zodType = "z.unknown()";
   }
 
   if (!field.required) {
-    zodType += '.optional()';
+    zodType += ".optional()";
   }
 
   if (field.default !== undefined) {
-    const defaultValue = typeof field.default === 'string'
-      ? `'${field.default}'`
-      : field.default;
+    const defaultValue =
+      typeof field.default === "string" ? `'${field.default}'` : field.default;
     zodType += `.default(${defaultValue})`;
   }
 
@@ -155,29 +161,29 @@ export const generateTrpcRouter = (schema: JapavelSchema): string => {
   const apiConfig = parseApiConfig(schema.API);
   const operations = apiConfig.operations;
 
-  let procedures = '';
+  let procedures = "";
 
-  if (operations.includes('create')) {
+  if (operations.includes("create")) {
     procedures += generateCreateProcedure(model, modelLower, apiConfig);
   }
 
-  if (operations.includes('read')) {
+  if (operations.includes("read")) {
     procedures += generateReadProcedure(model, modelLower, apiConfig);
   }
 
-  if (operations.includes('update')) {
+  if (operations.includes("update")) {
     procedures += generateUpdateProcedure(model, modelLower, apiConfig);
   }
 
-  if (operations.includes('delete')) {
+  if (operations.includes("delete")) {
     procedures += generateDeleteProcedure(model, modelLower, apiConfig);
   }
 
-  if (operations.includes('list')) {
+  if (operations.includes("list")) {
     procedures += generateListProcedure(model, modelLower, apiConfig);
   }
 
-  if (operations.includes('search')) {
+  if (operations.includes("search")) {
     procedures += generateSearchProcedure(model, modelLower, apiConfig);
   }
 
@@ -205,23 +211,39 @@ export type ${model}Router = typeof ${modelLower}Router;
 function parseApiConfig(api: string | ApiConfig | undefined): ApiConfig {
   if (!api) {
     return {
-      operations: ['create', 'read', 'update', 'delete', 'list'],
-      auth: 'authenticated',
+      operations: ["create", "read", "update", "delete", "list"],
+      auth: "authenticated",
       pagination: true,
     };
   }
 
-  if (typeof api === 'string') {
+  if (typeof api === "string") {
     // Parse shorthand: "crud", "read-only", "admin"
     switch (api) {
-      case 'crud':
-        return { operations: ['create', 'read', 'update', 'delete', 'list'], auth: 'authenticated', pagination: true };
-      case 'read-only':
-        return { operations: ['read', 'list'], auth: 'public', pagination: true };
-      case 'admin':
-        return { operations: ['create', 'read', 'update', 'delete', 'list'], auth: 'admin', pagination: true };
+      case "crud":
+        return {
+          operations: ["create", "read", "update", "delete", "list"],
+          auth: "authenticated",
+          pagination: true,
+        };
+      case "read-only":
+        return {
+          operations: ["read", "list"],
+          auth: "public",
+          pagination: true,
+        };
+      case "admin":
+        return {
+          operations: ["create", "read", "update", "delete", "list"],
+          auth: "admin",
+          pagination: true,
+        };
       default:
-        return { operations: ['create', 'read', 'update', 'delete', 'list'], auth: 'authenticated', pagination: true };
+        return {
+          operations: ["create", "read", "update", "delete", "list"],
+          auth: "authenticated",
+          pagination: true,
+        };
     }
   }
 
@@ -229,10 +251,14 @@ function parseApiConfig(api: string | ApiConfig | undefined): ApiConfig {
 }
 
 function getProcedureType(auth: string): string {
-  return auth === 'public' ? 'publicProcedure' : 'protectedProcedure';
+  return auth === "public" ? "publicProcedure" : "protectedProcedure";
 }
 
-function generateCreateProcedure(model: string, modelLower: string, config: ApiConfig): string {
+function generateCreateProcedure(
+  model: string,
+  modelLower: string,
+  config: ApiConfig,
+): string {
   const procedure = getProcedureType(config.auth);
   return `
   create: ${procedure}
@@ -246,7 +272,11 @@ function generateCreateProcedure(model: string, modelLower: string, config: ApiC
 `;
 }
 
-function generateReadProcedure(model: string, modelLower: string, config: ApiConfig): string {
+function generateReadProcedure(
+  model: string,
+  modelLower: string,
+  config: ApiConfig,
+): string {
   const procedure = getProcedureType(config.auth);
   return `
   getById: ${procedure}
@@ -263,7 +293,11 @@ function generateReadProcedure(model: string, modelLower: string, config: ApiCon
 `;
 }
 
-function generateUpdateProcedure(model: string, modelLower: string, config: ApiConfig): string {
+function generateUpdateProcedure(
+  model: string,
+  modelLower: string,
+  config: ApiConfig,
+): string {
   const procedure = getProcedureType(config.auth);
   return `
   update: ${procedure}
@@ -279,7 +313,11 @@ function generateUpdateProcedure(model: string, modelLower: string, config: ApiC
 `;
 }
 
-function generateDeleteProcedure(model: string, modelLower: string, config: ApiConfig): string {
+function generateDeleteProcedure(
+  model: string,
+  modelLower: string,
+  config: ApiConfig,
+): string {
   const procedure = getProcedureType(config.auth);
   return `
   delete: ${procedure}
@@ -293,7 +331,11 @@ function generateDeleteProcedure(model: string, modelLower: string, config: ApiC
 `;
 }
 
-function generateListProcedure(model: string, modelLower: string, config: ApiConfig): string {
+function generateListProcedure(
+  model: string,
+  modelLower: string,
+  config: ApiConfig,
+): string {
   const procedure = getProcedureType(config.auth);
   return `
   list: ${procedure}
@@ -323,7 +365,11 @@ function generateListProcedure(model: string, modelLower: string, config: ApiCon
 `;
 }
 
-function generateSearchProcedure(model: string, modelLower: string, config: ApiConfig): string {
+function generateSearchProcedure(
+  model: string,
+  modelLower: string,
+  config: ApiConfig,
+): string {
   const procedure = getProcedureType(config.auth);
   return `
   search: ${procedure}
@@ -359,52 +405,60 @@ export const generatePrismaModel = (schema: JapavelSchema): string => {
       const prismaType = fieldToPrisma(field);
       const modifiers: string[] = [];
 
-      if (name === 'id') {
-        modifiers.push('@id @default(uuid())');
+      if (name === "id") {
+        modifiers.push("@id @default(uuid())");
       }
       if (field.unique) {
-        modifiers.push('@unique');
+        modifiers.push("@unique");
       }
-      if (name === 'createdAt') {
-        modifiers.push('@default(now())');
+      if (name === "createdAt") {
+        modifiers.push("@default(now())");
       }
-      if (name === 'updatedAt') {
-        modifiers.push('@updatedAt');
+      if (name === "updatedAt") {
+        modifiers.push("@updatedAt");
       }
-      if (field.default !== undefined && name !== 'createdAt' && name !== 'updatedAt') {
-        const defaultVal = typeof field.default === 'string'
-          ? `"${field.default}"`
-          : field.default;
+      if (
+        field.default !== undefined &&
+        name !== "createdAt" &&
+        name !== "updatedAt"
+      ) {
+        const defaultVal =
+          typeof field.default === "string"
+            ? `"${field.default}"`
+            : field.default;
         modifiers.push(`@default(${defaultVal})`);
       }
 
-      const modifierStr = modifiers.length > 0 ? ' ' + modifiers.join(' ') : '';
-      const optionalMark = !field.required && name !== 'id' ? '?' : '';
+      const modifierStr = modifiers.length > 0 ? " " + modifiers.join(" ") : "";
+      const optionalMark = !field.required && name !== "id" ? "?" : "";
 
       return `  ${name} ${prismaType}${optionalMark}${modifierStr}`;
     })
-    .join('\n');
+    .join("\n");
 
   // Add relationship fields if present
-  let relationLines = '';
+  let relationLines = "";
   if (schema.Relations) {
-    relationLines = '\n' + Object.entries(schema.Relations)
-      .map(([name, relation]) => {
-        switch (relation.type) {
-          case 'hasOne':
-            return `  ${name} ${relation.model}?`;
-          case 'hasMany':
-            return `  ${name} ${relation.model}[]`;
-          case 'belongsTo':
-            const fk = relation.foreignKey || `${name}Id`;
-            return `  ${name} ${relation.model} @relation(fields: [${fk}], references: [id])\n  ${fk} String`;
-          case 'manyToMany':
-            return `  ${name} ${relation.model}[]`;
-          default:
-            return '';
-        }
-      })
-      .join('\n');
+    relationLines =
+      "\n" +
+      Object.entries(schema.Relations)
+        .map(([name, relation]) => {
+          const rel = relation as Relationship;
+          switch (rel.type) {
+            case "hasOne":
+              return `  ${name} ${rel.model}?`;
+            case "hasMany":
+              return `  ${name} ${rel.model}[]`;
+            case "belongsTo":
+              const fk = rel.foreignKey || `${name}Id`;
+              return `  ${name} ${rel.model} @relation(fields: [${fk}], references: [id])\n  ${fk} String`;
+            case "manyToMany":
+              return `  ${name} ${rel.model}[]`;
+            default:
+              return "";
+          }
+        })
+        .join("\n");
   }
 
   return `/**
@@ -419,27 +473,27 @@ ${fieldLines}${relationLines}
 
 function fieldToPrisma(field: FieldDefinition): string {
   switch (field.type) {
-    case 'string':
-    case 'email':
-    case 'url':
-    case 'uuid':
-      return 'String';
-    case 'number':
-      return 'Float';
-    case 'int':
-      return 'Int';
-    case 'boolean':
-      return 'Boolean';
-    case 'date':
-      return 'DateTime';
-    case 'json':
-      return 'Json';
-    case 'array':
-      return 'String[]';
-    case 'enum':
-      return 'String';
+    case "string":
+    case "email":
+    case "url":
+    case "uuid":
+      return "String";
+    case "number":
+      return "Float";
+    case "int":
+      return "Int";
+    case "boolean":
+      return "Boolean";
+    case "date":
+      return "DateTime";
+    case "json":
+      return "Json";
+    case "array":
+      return "String[]";
+    case "enum":
+      return "String";
     default:
-      return 'String';
+      return "String";
   }
 }
 
@@ -452,22 +506,24 @@ export const generateReactComponent = (schema: JapavelSchema): string => {
   const fields = getNormalizedFields(schema);
   const viewConfig = parseViewConfig(schema.View);
 
-  const displayFields = viewConfig.fields || Object.keys(fields).filter(f =>
-    !['id', 'createdAt', 'updatedAt'].includes(f)
-  );
+  const displayFields =
+    viewConfig.fields ||
+    Object.keys(fields).filter(
+      (f) => !["id", "createdAt", "updatedAt"].includes(f),
+    );
 
   const formFields = displayFields
-    .map(name => {
+    .map((name) => {
       const field = fields[name];
-      if (!field) return '';
+      if (!field) return "";
       return generateFormField(name, field);
     })
     .filter(Boolean)
-    .join('\n');
+    .join("\n");
 
   const tableColumns = displayFields
-    .map(name => `      { key: '${name}', label: '${capitalize(name)}' },`)
-    .join('\n');
+    .map((name) => `      { key: '${name}', label: '${capitalize(name)}' },`)
+    .join("\n");
 
   return `import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -575,10 +631,14 @@ export const ${model}Card: React.FC<{
   return (
     <div className="bg-white shadow rounded-lg p-6">
       <div className="space-y-2">
-${displayFields.map(name => `        <div>
+${displayFields
+  .map(
+    (name) => `        <div>
           <span className="text-gray-500 text-sm">${capitalize(name)}:</span>
           <span className="ml-2">{String(data.${name} ?? '')}</span>
-        </div>`).join('\n')}
+        </div>`,
+  )
+  .join("\n")}
       </div>
       <div className="mt-4 flex gap-2">
         {onEdit && (
@@ -600,11 +660,11 @@ ${displayFields.map(name => `        <div>
 
 function parseViewConfig(view: string | ViewConfig | undefined): ViewConfig {
   if (!view) {
-    return { type: 'table' };
+    return { type: "table" };
   }
 
-  if (typeof view === 'string') {
-    return { type: view as ViewConfig['type'] };
+  if (typeof view === "string") {
+    return { type: view as ViewConfig["type"] };
   }
 
   return view;
@@ -612,19 +672,19 @@ function parseViewConfig(view: string | ViewConfig | undefined): ViewConfig {
 
 function generateFormField(name: string, field: FieldDefinition): string {
   const label = capitalize(name);
-  const required = field.required ? 'required' : '';
+  const required = field.required ? "required" : "";
 
   switch (field.type) {
-    case 'boolean':
+    case "boolean":
       return `      <label className="flex items-center gap-2">
         <input type="checkbox" {...register('${name}')} className="rounded" />
         <span>${label}</span>
       </label>`;
 
-    case 'enum':
+    case "enum":
       const options = (field.enum || [])
-        .map(v => `          <option value="${v}">${capitalize(v)}</option>`)
-        .join('\n');
+        .map((v) => `          <option value="${v}">${capitalize(v)}</option>`)
+        .join("\n");
       return `      <div>
         <label className="block text-sm font-medium text-gray-700">${label}</label>
         <select {...register('${name}')} ${required} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
@@ -634,29 +694,29 @@ ${options}
         {errors.${name} && <p className="mt-1 text-sm text-red-600">{errors.${name}?.message}</p>}
       </div>`;
 
-    case 'date':
+    case "date":
       return `      <div>
         <label className="block text-sm font-medium text-gray-700">${label}</label>
         <input type="date" {...register('${name}')} ${required} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
         {errors.${name} && <p className="mt-1 text-sm text-red-600">{errors.${name}?.message}</p>}
       </div>`;
 
-    case 'number':
-    case 'int':
+    case "number":
+    case "int":
       return `      <div>
         <label className="block text-sm font-medium text-gray-700">${label}</label>
         <input type="number" {...register('${name}', { valueAsNumber: true })} ${required} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
         {errors.${name} && <p className="mt-1 text-sm text-red-600">{errors.${name}?.message}</p>}
       </div>`;
 
-    case 'email':
+    case "email":
       return `      <div>
         <label className="block text-sm font-medium text-gray-700">${label}</label>
         <input type="email" {...register('${name}')} ${required} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
         {errors.${name} && <p className="mt-1 text-sm text-red-600">{errors.${name}?.message}</p>}
       </div>`;
 
-    case 'url':
+    case "url":
       return `      <div>
         <label className="block text-sm font-medium text-gray-700">${label}</label>
         <input type="url" {...register('${name}')} ${required} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" />
@@ -686,10 +746,10 @@ export const generateTypes = (schema: JapavelSchema): string => {
   const fieldTypes = Object.entries(fields)
     .map(([name, field]) => {
       const tsType = fieldToTypeScript(field);
-      const optional = !field.required ? '?' : '';
+      const optional = !field.required ? "?" : "";
       return `  ${name}${optional}: ${tsType};`;
     })
-    .join('\n');
+    .join("\n");
 
   return `/**
  * ${model} Types
@@ -719,28 +779,28 @@ export interface ${model}ListResponse {
 
 function fieldToTypeScript(field: FieldDefinition): string {
   switch (field.type) {
-    case 'string':
-    case 'email':
-    case 'url':
-    case 'uuid':
-      return 'string';
-    case 'number':
-    case 'int':
-      return 'number';
-    case 'boolean':
-      return 'boolean';
-    case 'date':
-      return 'Date';
-    case 'json':
-      return 'Record<string, unknown>';
-    case 'array':
-      return `${field.items || 'string'}[]`;
-    case 'enum':
+    case "string":
+    case "email":
+    case "url":
+    case "uuid":
+      return "string";
+    case "number":
+    case "int":
+      return "number";
+    case "boolean":
+      return "boolean";
+    case "date":
+      return "Date";
+    case "json":
+      return "Record<string, unknown>";
+    case "array":
+      return `${field.items || "string"}[]`;
+    case "enum":
       if (field.enum && field.enum.length > 0) {
-        return field.enum.map(v => `'${v}'`).join(' | ');
+        return field.enum.map((v) => `'${v}'`).join(" | ");
       }
-      return 'string';
+      return "string";
     default:
-      return 'unknown';
+      return "unknown";
   }
 }

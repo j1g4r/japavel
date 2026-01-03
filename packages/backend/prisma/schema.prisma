@@ -37,12 +37,15 @@ model User {
   deletedAt        DateTime?
 
   // Relations
+  tenant           Tenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  tenantId         String?  @map("tenant_id")
   sessions         Session[]
   apiKeys          ApiKey[]
   auditLogs        AuditLog[]
   consentRecords   ConsentRecord[]
   dataSubjectRequests DataSubjectRequest[]
 
+  @@index([tenantId])
   @@index([email, deletedAt])
   @@index([role])
   @@index([emailVerified])
@@ -209,7 +212,7 @@ model DataSubjectRequest {
   attachments     String[] @default([])
 
   // Assignment
-  assignedTo      String?  @uuid
+  assignedTo      String?
 
   // Metadata
   metadata        Json?
@@ -340,8 +343,8 @@ model Notification {
   id          String   @id @default(uuid())
 
   // Recipient
-  userId      String?  @uuid
-  tenantId    String?  @uuid
+  userId      String?
+  tenantId    String?
   email       String?  @db.VarChar(255)
 
   // Content
@@ -384,7 +387,7 @@ model Setting {
 
   // Scope
   scope       String   @default("global") @db.VarChar(50)   // global, tenant, user
-  scopeId     String?  @uuid
+  scopeId     String?
 
   // Validation
   validation  Json?
@@ -394,7 +397,7 @@ model Setting {
   category    String?  @db.VarChar(100)
 
   // Audit
-  updatedAtBy String?  @uuid
+  updatedAtBy String?
 
   // Timestamps
   createdAt   DateTime @default(now())
@@ -480,7 +483,7 @@ model SecurityEvent {
   // Mitigation
   mitigated   Boolean  @default(false)
   mitigatedAt DateTime?
-  mitigatedBy String?  @uuid
+  mitigatedBy String?
 
   // Timestamps
   createdAt   DateTime @default(now())

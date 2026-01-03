@@ -1,23 +1,23 @@
-import fs from 'fs';
-import yaml from 'yaml';
-import { z } from 'zod';
+import fs from "fs";
+import yaml from "yaml";
+import { z } from "zod";
 /**
  * DSL Schema Definition
  * Defines the structure of YAML-based schema definitions
  */
 // Field type definitions
 export const FieldTypeSchema = z.enum([
-    'string',
-    'number',
-    'boolean',
-    'date',
-    'uuid',
-    'email',
-    'url',
-    'int',
-    'json',
-    'array',
-    'enum',
+    "string",
+    "number",
+    "boolean",
+    "date",
+    "uuid",
+    "email",
+    "url",
+    "int",
+    "json",
+    "array",
+    "enum",
 ]);
 // Field definition with modifiers
 export const FieldDefinitionSchema = z.object({
@@ -36,7 +36,7 @@ export const FieldDefinitionSchema = z.object({
 });
 // View configuration
 export const ViewConfigSchema = z.object({
-    type: z.enum(['table', 'form', 'card', 'list', 'detail']),
+    type: z.enum(["table", "form", "card", "list", "detail"]),
     fields: z.array(z.string()).optional(),
     sortable: z.array(z.string()).optional(),
     filterable: z.array(z.string()).optional(),
@@ -44,14 +44,16 @@ export const ViewConfigSchema = z.object({
 });
 // API configuration
 export const ApiConfigSchema = z.object({
-    operations: z.array(z.enum(['create', 'read', 'update', 'delete', 'list', 'search'])).default(['create', 'read', 'update', 'delete', 'list']),
-    auth: z.enum(['public', 'authenticated', 'admin']).default('authenticated'),
+    operations: z
+        .array(z.enum(["create", "read", "update", "delete", "list", "search"]))
+        .default(["create", "read", "update", "delete", "list"]),
+    auth: z.enum(["public", "authenticated", "admin"]).default("authenticated"),
     rateLimit: z.number().optional(),
     pagination: z.boolean().default(true),
 });
 // Relationship configuration
 export const RelationshipSchema = z.object({
-    type: z.enum(['hasOne', 'hasMany', 'belongsTo', 'manyToMany']),
+    type: z.enum(["hasOne", "hasMany", "belongsTo", "manyToMany"]),
     model: z.string(),
     foreignKey: z.string().optional(),
     through: z.string().optional(), // For manyToMany
@@ -59,24 +61,26 @@ export const RelationshipSchema = z.object({
 // Full Japavel Schema definition
 export const JapavelSchemaSchema = z.object({
     Model: z.string(),
-    Fields: z.record(z.union([z.string(), FieldDefinitionSchema])),
+    Fields: z.record(z.string(), z.union([z.string(), FieldDefinitionSchema])),
     View: z.union([z.string(), ViewConfigSchema]).optional(),
     API: z.union([z.string(), ApiConfigSchema]).optional(),
-    Relations: z.record(RelationshipSchema).optional(),
-    Hooks: z.object({
+    Relations: z.record(z.string(), RelationshipSchema).optional(),
+    Hooks: z
+        .object({
         beforeCreate: z.string().optional(),
         afterCreate: z.string().optional(),
         beforeUpdate: z.string().optional(),
         afterUpdate: z.string().optional(),
         beforeDelete: z.string().optional(),
         afterDelete: z.string().optional(),
-    }).optional(),
+    })
+        .optional(),
 });
 /**
  * Parse a DSL file and return a validated JapavelSchema
  */
 export const parseDSL = (filePath) => {
-    const content = fs.readFileSync(filePath, 'utf8');
+    const content = fs.readFileSync(filePath, "utf8");
     return parseDSLContent(content);
 };
 /**
@@ -90,24 +94,26 @@ export const parseDSLContent = (content) => {
  * Parse a directory of DSL files
  */
 export const parseDSLDirectory = (dirPath) => {
-    const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.yaml') || f.endsWith('.yml') || f.endsWith('.japavel'));
-    return files.map(file => parseDSL(`${dirPath}/${file}`));
+    const files = fs
+        .readdirSync(dirPath)
+        .filter((f) => f.endsWith(".yaml") || f.endsWith(".yml") || f.endsWith(".japavel"));
+    return files.map((file) => parseDSL(`${dirPath}/${file}`));
 };
 /**
  * Normalize field definition to full form
  */
 export const normalizeField = (field) => {
-    if (typeof field === 'string') {
+    if (typeof field === "string") {
         // Parse shorthand: "string", "string!", "email?", "enum(admin,user)"
-        const isRequired = !field.endsWith('?');
-        const cleanType = field.replace('?', '').replace('!', '');
+        const isRequired = !field.endsWith("?");
+        const cleanType = field.replace("?", "").replace("!", "");
         // Check for enum shorthand
         const enumMatch = cleanType.match(/^enum\((.+)\)$/);
         if (enumMatch) {
             return {
-                type: 'enum',
+                type: "enum",
                 required: isRequired,
-                enum: enumMatch[1].split(',').map(s => s.trim()),
+                enum: enumMatch[1].split(",").map((s) => s.trim()),
                 unique: false,
             };
         }
@@ -115,7 +121,7 @@ export const normalizeField = (field) => {
         const arrayMatch = cleanType.match(/^array<(.+)>$/);
         if (arrayMatch) {
             return {
-                type: 'array',
+                type: "array",
                 required: isRequired,
                 items: arrayMatch[1],
                 unique: false,
@@ -144,7 +150,7 @@ export const getNormalizedFields = (schema) => {
  */
 export const validateRelationships = (schemas) => {
     const errors = [];
-    const modelNames = new Set(schemas.map(s => s.Model));
+    const modelNames = new Set(schemas.map((s) => s.Model));
     for (const schema of schemas) {
         if (!schema.Relations)
             continue;
@@ -152,7 +158,7 @@ export const validateRelationships = (schemas) => {
             if (!modelNames.has(relation.model)) {
                 errors.push(`${schema.Model}.${name}: References unknown model "${relation.model}"`);
             }
-            if (relation.type === 'manyToMany' && !relation.through) {
+            if (relation.type === "manyToMany" && !relation.through) {
                 errors.push(`${schema.Model}.${name}: manyToMany relation requires "through" junction table`);
             }
         }

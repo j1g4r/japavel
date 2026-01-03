@@ -5,23 +5,20 @@ import { z } from 'zod';
  */
 export declare const VerificationConfigSchema: z.ZodObject<{
     projectRoot: z.ZodString;
-    checks: z.ZodDefault<z.ZodArray<z.ZodEnum<["typescript", "eslint", "prettier", "test", "build", "prisma", "atomic-rules", "security"]>, "many">>;
+    checks: z.ZodDefault<z.ZodArray<z.ZodEnum<{
+        typescript: "typescript";
+        eslint: "eslint";
+        prisma: "prisma";
+        build: "build";
+        test: "test";
+        prettier: "prettier";
+        "atomic-rules": "atomic-rules";
+        security: "security";
+    }>>>;
     timeout: z.ZodDefault<z.ZodNumber>;
     failFast: z.ZodDefault<z.ZodBoolean>;
     verbose: z.ZodDefault<z.ZodBoolean>;
-}, "strip", z.ZodTypeAny, {
-    projectRoot: string;
-    checks: ("typescript" | "eslint" | "prisma" | "build" | "test" | "prettier" | "atomic-rules" | "security")[];
-    timeout: number;
-    failFast: boolean;
-    verbose: boolean;
-}, {
-    projectRoot: string;
-    checks?: ("typescript" | "eslint" | "prisma" | "build" | "test" | "prettier" | "atomic-rules" | "security")[] | undefined;
-    timeout?: number | undefined;
-    failFast?: boolean | undefined;
-    verbose?: boolean | undefined;
-}>;
+}, z.core.$strip>;
 export type VerificationConfig = z.infer<typeof VerificationConfigSchema>;
 export declare const CheckResultSchema: z.ZodObject<{
     name: z.ZodString;
@@ -32,36 +29,8 @@ export declare const CheckResultSchema: z.ZodObject<{
         message: z.ZodString;
         file: z.ZodOptional<z.ZodString>;
         line: z.ZodOptional<z.ZodNumber>;
-    }, "strip", z.ZodTypeAny, {
-        message: string;
-        file?: string | undefined;
-        line?: number | undefined;
-    }, {
-        message: string;
-        file?: string | undefined;
-        line?: number | undefined;
-    }>, "many">;
-}, "strip", z.ZodTypeAny, {
-    name: string;
-    errors: {
-        message: string;
-        file?: string | undefined;
-        line?: number | undefined;
-    }[];
-    passed: boolean;
-    duration: number;
-    output: string;
-}, {
-    name: string;
-    errors: {
-        message: string;
-        file?: string | undefined;
-        line?: number | undefined;
-    }[];
-    passed: boolean;
-    duration: number;
-    output: string;
-}>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
 export type CheckResult = z.infer<typeof CheckResultSchema>;
 export declare const VerificationResultSchema: z.ZodObject<{
     passed: z.ZodBoolean;
@@ -78,74 +47,10 @@ export declare const VerificationResultSchema: z.ZodObject<{
             message: z.ZodString;
             file: z.ZodOptional<z.ZodString>;
             line: z.ZodOptional<z.ZodNumber>;
-        }, "strip", z.ZodTypeAny, {
-            message: string;
-            file?: string | undefined;
-            line?: number | undefined;
-        }, {
-            message: string;
-            file?: string | undefined;
-            line?: number | undefined;
-        }>, "many">;
-    }, "strip", z.ZodTypeAny, {
-        name: string;
-        errors: {
-            message: string;
-            file?: string | undefined;
-            line?: number | undefined;
-        }[];
-        passed: boolean;
-        duration: number;
-        output: string;
-    }, {
-        name: string;
-        errors: {
-            message: string;
-            file?: string | undefined;
-            line?: number | undefined;
-        }[];
-        passed: boolean;
-        duration: number;
-        output: string;
-    }>, "many">;
+        }, z.core.$strip>>;
+    }, z.core.$strip>>;
     summary: z.ZodString;
-}, "strip", z.ZodTypeAny, {
-    passed: boolean;
-    totalChecks: number;
-    passedChecks: number;
-    failedChecks: number;
-    totalDuration: number;
-    results: {
-        name: string;
-        errors: {
-            message: string;
-            file?: string | undefined;
-            line?: number | undefined;
-        }[];
-        passed: boolean;
-        duration: number;
-        output: string;
-    }[];
-    summary: string;
-}, {
-    passed: boolean;
-    totalChecks: number;
-    passedChecks: number;
-    failedChecks: number;
-    totalDuration: number;
-    results: {
-        name: string;
-        errors: {
-            message: string;
-            file?: string | undefined;
-            line?: number | undefined;
-        }[];
-        passed: boolean;
-        duration: number;
-        output: string;
-    }[];
-    summary: string;
-}>;
+}, z.core.$strip>;
 export type VerificationResult = z.infer<typeof VerificationResultSchema>;
 /**
  * Verification Loop System

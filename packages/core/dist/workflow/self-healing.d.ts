@@ -8,106 +8,48 @@ export declare const WorkflowConfigSchema: z.ZodObject<{
     projectRoot: z.ZodString;
     logPath: z.ZodOptional<z.ZodString>;
     dryRun: z.ZodDefault<z.ZodBoolean>;
-    fixStrategies: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
-}, "strip", z.ZodTypeAny, {
-    maxAttempts: number;
-    projectRoot: string;
-    dryRun: boolean;
-    fixStrategies: string[];
-    logPath?: string | undefined;
-}, {
-    projectRoot: string;
-    maxAttempts?: number | undefined;
-    logPath?: string | undefined;
-    dryRun?: boolean | undefined;
-    fixStrategies?: string[] | undefined;
-}>;
+    fixStrategies: z.ZodDefault<z.ZodArray<z.ZodString>>;
+}, z.core.$strip>;
 export type WorkflowConfig = z.infer<typeof WorkflowConfigSchema>;
 export declare const ErrorSchema: z.ZodObject<{
-    type: z.ZodEnum<["typescript", "eslint", "runtime", "prisma", "build", "test"]>;
+    type: z.ZodEnum<{
+        typescript: "typescript";
+        eslint: "eslint";
+        prisma: "prisma";
+        runtime: "runtime";
+        build: "build";
+        test: "test";
+    }>;
     message: z.ZodString;
     file: z.ZodOptional<z.ZodString>;
     line: z.ZodOptional<z.ZodNumber>;
     column: z.ZodOptional<z.ZodNumber>;
     code: z.ZodOptional<z.ZodString>;
     suggestion: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
-    type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-    message: string;
-    code?: string | undefined;
-    file?: string | undefined;
-    line?: number | undefined;
-    column?: number | undefined;
-    suggestion?: string | undefined;
-}, {
-    type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-    message: string;
-    code?: string | undefined;
-    file?: string | undefined;
-    line?: number | undefined;
-    column?: number | undefined;
-    suggestion?: string | undefined;
-}>;
+}, z.core.$strip>;
 export type WorkflowError = z.infer<typeof ErrorSchema>;
 export declare const FixResultSchema: z.ZodObject<{
     success: z.ZodBoolean;
     error: z.ZodObject<{
-        type: z.ZodEnum<["typescript", "eslint", "runtime", "prisma", "build", "test"]>;
+        type: z.ZodEnum<{
+            typescript: "typescript";
+            eslint: "eslint";
+            prisma: "prisma";
+            runtime: "runtime";
+            build: "build";
+            test: "test";
+        }>;
         message: z.ZodString;
         file: z.ZodOptional<z.ZodString>;
         line: z.ZodOptional<z.ZodNumber>;
         column: z.ZodOptional<z.ZodNumber>;
         code: z.ZodOptional<z.ZodString>;
         suggestion: z.ZodOptional<z.ZodString>;
-    }, "strip", z.ZodTypeAny, {
-        type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-        message: string;
-        code?: string | undefined;
-        file?: string | undefined;
-        line?: number | undefined;
-        column?: number | undefined;
-        suggestion?: string | undefined;
-    }, {
-        type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-        message: string;
-        code?: string | undefined;
-        file?: string | undefined;
-        line?: number | undefined;
-        column?: number | undefined;
-        suggestion?: string | undefined;
-    }>;
+    }, z.core.$strip>;
     fixApplied: z.ZodOptional<z.ZodString>;
     newContent: z.ZodOptional<z.ZodString>;
     requiresManualFix: z.ZodDefault<z.ZodBoolean>;
-}, "strip", z.ZodTypeAny, {
-    success: boolean;
-    error: {
-        type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-        message: string;
-        code?: string | undefined;
-        file?: string | undefined;
-        line?: number | undefined;
-        column?: number | undefined;
-        suggestion?: string | undefined;
-    };
-    requiresManualFix: boolean;
-    fixApplied?: string | undefined;
-    newContent?: string | undefined;
-}, {
-    success: boolean;
-    error: {
-        type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-        message: string;
-        code?: string | undefined;
-        file?: string | undefined;
-        line?: number | undefined;
-        column?: number | undefined;
-        suggestion?: string | undefined;
-    };
-    fixApplied?: string | undefined;
-    newContent?: string | undefined;
-    requiresManualFix?: boolean | undefined;
-}>;
+}, z.core.$strip>;
 export type FixResult = z.infer<typeof FixResultSchema>;
 export declare const WorkflowResultSchema: z.ZodObject<{
     success: z.ZodBoolean;
@@ -116,153 +58,45 @@ export declare const WorkflowResultSchema: z.ZodObject<{
     remainingErrors: z.ZodNumber;
     attempts: z.ZodNumber;
     errors: z.ZodArray<z.ZodObject<{
-        type: z.ZodEnum<["typescript", "eslint", "runtime", "prisma", "build", "test"]>;
+        type: z.ZodEnum<{
+            typescript: "typescript";
+            eslint: "eslint";
+            prisma: "prisma";
+            runtime: "runtime";
+            build: "build";
+            test: "test";
+        }>;
         message: z.ZodString;
         file: z.ZodOptional<z.ZodString>;
         line: z.ZodOptional<z.ZodNumber>;
         column: z.ZodOptional<z.ZodNumber>;
         code: z.ZodOptional<z.ZodString>;
         suggestion: z.ZodOptional<z.ZodString>;
-    }, "strip", z.ZodTypeAny, {
-        type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-        message: string;
-        code?: string | undefined;
-        file?: string | undefined;
-        line?: number | undefined;
-        column?: number | undefined;
-        suggestion?: string | undefined;
-    }, {
-        type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-        message: string;
-        code?: string | undefined;
-        file?: string | undefined;
-        line?: number | undefined;
-        column?: number | undefined;
-        suggestion?: string | undefined;
-    }>, "many">;
+    }, z.core.$strip>>;
     fixes: z.ZodArray<z.ZodObject<{
         success: z.ZodBoolean;
         error: z.ZodObject<{
-            type: z.ZodEnum<["typescript", "eslint", "runtime", "prisma", "build", "test"]>;
+            type: z.ZodEnum<{
+                typescript: "typescript";
+                eslint: "eslint";
+                prisma: "prisma";
+                runtime: "runtime";
+                build: "build";
+                test: "test";
+            }>;
             message: z.ZodString;
             file: z.ZodOptional<z.ZodString>;
             line: z.ZodOptional<z.ZodNumber>;
             column: z.ZodOptional<z.ZodNumber>;
             code: z.ZodOptional<z.ZodString>;
             suggestion: z.ZodOptional<z.ZodString>;
-        }, "strip", z.ZodTypeAny, {
-            type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-            message: string;
-            code?: string | undefined;
-            file?: string | undefined;
-            line?: number | undefined;
-            column?: number | undefined;
-            suggestion?: string | undefined;
-        }, {
-            type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-            message: string;
-            code?: string | undefined;
-            file?: string | undefined;
-            line?: number | undefined;
-            column?: number | undefined;
-            suggestion?: string | undefined;
-        }>;
+        }, z.core.$strip>;
         fixApplied: z.ZodOptional<z.ZodString>;
         newContent: z.ZodOptional<z.ZodString>;
         requiresManualFix: z.ZodDefault<z.ZodBoolean>;
-    }, "strip", z.ZodTypeAny, {
-        success: boolean;
-        error: {
-            type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-            message: string;
-            code?: string | undefined;
-            file?: string | undefined;
-            line?: number | undefined;
-            column?: number | undefined;
-            suggestion?: string | undefined;
-        };
-        requiresManualFix: boolean;
-        fixApplied?: string | undefined;
-        newContent?: string | undefined;
-    }, {
-        success: boolean;
-        error: {
-            type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-            message: string;
-            code?: string | undefined;
-            file?: string | undefined;
-            line?: number | undefined;
-            column?: number | undefined;
-            suggestion?: string | undefined;
-        };
-        fixApplied?: string | undefined;
-        newContent?: string | undefined;
-        requiresManualFix?: boolean | undefined;
-    }>, "many">;
-    logs: z.ZodArray<z.ZodString, "many">;
-}, "strip", z.ZodTypeAny, {
-    success: boolean;
-    totalErrors: number;
-    fixedErrors: number;
-    remainingErrors: number;
-    attempts: number;
-    errors: {
-        type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-        message: string;
-        code?: string | undefined;
-        file?: string | undefined;
-        line?: number | undefined;
-        column?: number | undefined;
-        suggestion?: string | undefined;
-    }[];
-    fixes: {
-        success: boolean;
-        error: {
-            type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-            message: string;
-            code?: string | undefined;
-            file?: string | undefined;
-            line?: number | undefined;
-            column?: number | undefined;
-            suggestion?: string | undefined;
-        };
-        requiresManualFix: boolean;
-        fixApplied?: string | undefined;
-        newContent?: string | undefined;
-    }[];
-    logs: string[];
-}, {
-    success: boolean;
-    totalErrors: number;
-    fixedErrors: number;
-    remainingErrors: number;
-    attempts: number;
-    errors: {
-        type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-        message: string;
-        code?: string | undefined;
-        file?: string | undefined;
-        line?: number | undefined;
-        column?: number | undefined;
-        suggestion?: string | undefined;
-    }[];
-    fixes: {
-        success: boolean;
-        error: {
-            type: "typescript" | "eslint" | "prisma" | "runtime" | "build" | "test";
-            message: string;
-            code?: string | undefined;
-            file?: string | undefined;
-            line?: number | undefined;
-            column?: number | undefined;
-            suggestion?: string | undefined;
-        };
-        fixApplied?: string | undefined;
-        newContent?: string | undefined;
-        requiresManualFix?: boolean | undefined;
-    }[];
-    logs: string[];
-}>;
+    }, z.core.$strip>>;
+    logs: z.ZodArray<z.ZodString>;
+}, z.core.$strip>;
 export type WorkflowResult = z.infer<typeof WorkflowResultSchema>;
 /**
  * Self-Healing Workflow Engine

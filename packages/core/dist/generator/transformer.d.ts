@@ -1,4 +1,4 @@
-import { JapavelSchema } from './parser';
+import { JapavelSchema } from "./parser";
 /**
  * Code Generator - Transforms JapavelSchema DSL to TypeScript/Prisma code
  */

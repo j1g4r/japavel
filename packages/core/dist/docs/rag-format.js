@@ -1,7 +1,7 @@
-import { z } from 'zod';
-import fs from 'fs';
-import path from 'path';
-import crypto from 'crypto';
+import { z } from "zod";
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
 /**
  * RAG-Ready Documentation Format
  * Structured documentation optimized for Retrieval-Augmented Generation
@@ -11,15 +11,15 @@ export const DocumentMetadataSchema = z.object({
     id: z.string().uuid(),
     title: z.string(),
     type: z.enum([
-        'api',
-        'component',
-        'schema',
-        'guide',
-        'pattern',
-        'pitfall',
-        'example',
-        'architecture',
-        'troubleshooting',
+        "api",
+        "component",
+        "schema",
+        "guide",
+        "pattern",
+        "pitfall",
+        "example",
+        "architecture",
+        "troubleshooting",
     ]),
     tags: z.array(z.string()),
     created: z.string().datetime(),
@@ -34,12 +34,14 @@ export const DocumentSectionSchema = z.object({
     heading: z.string(),
     level: z.number().int().min(1).max(6),
     content: z.string(),
-    codeBlocks: z.array(z.object({
+    codeBlocks: z
+        .array(z.object({
         language: z.string(),
         code: z.string(),
         filename: z.string().optional(),
         description: z.string().optional(),
-    })).default([]),
+    }))
+        .default([]),
     keywords: z.array(z.string()),
 });
 // Full RAG document schema
@@ -47,7 +49,7 @@ export const RAGDocumentSchema = z.object({
     metadata: DocumentMetadataSchema,
     summary: z.string().max(500),
     sections: z.array(DocumentSectionSchema),
-    embeddings: z.record(z.array(z.number())).optional(),
+    embeddings: z.record(z.string(), z.array(z.number())).optional(),
     searchIndex: z.object({
         keywords: z.array(z.string()),
         concepts: z.array(z.string()),
@@ -61,14 +63,14 @@ export const DocumentCollectionSchema = z.object({
     version: z.string(),
     lastUpdated: z.string().datetime(),
     documents: z.array(RAGDocumentSchema),
-    index: z.record(z.array(z.string())),
+    index: z.record(z.string(), z.array(z.string())),
 });
 /**
  * RAG Document Builder
  */
 export class RAGDocumentBuilder {
     metadata = {};
-    summary = '';
+    summary = "";
     sections = [];
     searchIndex = {
         keywords: [],
@@ -144,16 +146,18 @@ export class RAGDocumentBuilder {
         this.searchIndex.keywords = [...new Set(this.searchIndex.keywords)];
         this.searchIndex.concepts = [...new Set(this.searchIndex.concepts)];
         this.searchIndex.technologies = [...new Set(this.searchIndex.technologies)];
-        this.searchIndex.problemsDomain = [...new Set(this.searchIndex.problemsDomain)];
+        this.searchIndex.problemsDomain = [
+            ...new Set(this.searchIndex.problemsDomain),
+        ];
         return RAGDocumentSchema.parse({
             metadata: {
                 id: this.metadata.id || crypto.randomUUID(),
-                title: this.metadata.title || 'Untitled',
-                type: this.metadata.type || 'guide',
+                title: this.metadata.title || "Untitled",
+                type: this.metadata.type || "guide",
                 tags: this.metadata.tags || [],
                 created: this.metadata.created || new Date().toISOString(),
                 updated: this.metadata.updated || new Date().toISOString(),
-                version: this.metadata.version || '1.0.0',
+                version: this.metadata.version || "1.0.0",
                 source: this.metadata.source,
                 relatedDocs: this.metadata.relatedDocs || [],
             },
@@ -193,7 +197,7 @@ export const parseMarkdownToRAG = (content, metadata) => {
         let codeMatch;
         while ((codeMatch = codePattern.exec(sectionContent)) !== null) {
             codeBlocks.push({
-                language: codeMatch[1] || 'text',
+                language: codeMatch[1] || "text",
                 code: codeMatch[2].trim(),
             });
         }
@@ -211,17 +215,29 @@ export const parseMarkdownToRAG = (content, metadata) => {
         builder.addSection({
             heading,
             level,
-            content: sectionContent.replace(/```[\s\S]*?```/g, '').trim(),
+            content: sectionContent.replace(/```[\s\S]*?```/g, "").trim(),
             codeBlocks,
             keywords: [...new Set(keywords)],
         });
     }
     // Auto-detect technologies from content
     const techPatterns = [
-        'react', 'typescript', 'javascript', 'node', 'prisma', 'trpc', 'zod',
-        'tailwind', 'css', 'html', 'sql', 'graphql', 'rest', 'api',
+        "react",
+        "typescript",
+        "javascript",
+        "node",
+        "prisma",
+        "trpc",
+        "zod",
+        "tailwind",
+        "css",
+        "html",
+        "sql",
+        "graphql",
+        "rest",
+        "api",
     ];
-    const detectedTech = techPatterns.filter(tech => content.toLowerCase().includes(tech));
+    const detectedTech = techPatterns.filter((tech) => content.toLowerCase().includes(tech));
     builder.addTechnologies(detectedTech);
     return builder.build();
 };
@@ -235,7 +251,7 @@ export class DocumentCollectionManager {
         this.basePath = basePath;
         this.collection = {
             name,
-            version: '1.0.0',
+            version: "1.0.0",
             lastUpdated: new Date().toISOString(),
             documents: [],
             index: {},
@@ -245,9 +261,9 @@ export class DocumentCollectionManager {
      * Load collection from disk
      */
     async load() {
-        const filePath = path.join(this.basePath, 'rag-collection.json');
+        const filePath = path.join(this.basePath, "rag-collection.json");
         if (fs.existsSync(filePath)) {
-            const content = fs.readFileSync(filePath, 'utf-8');
+            const content = fs.readFileSync(filePath, "utf-8");
             this.collection = DocumentCollectionSchema.parse(JSON.parse(content));
         }
     }
@@ -255,7 +271,7 @@ export class DocumentCollectionManager {
      * Save collection to disk
      */
     async save() {
-        const filePath = path.join(this.basePath, 'rag-collection.json');
+        const filePath = path.join(this.basePath, "rag-collection.json");
         fs.mkdirSync(this.basePath, { recursive: true });
         fs.writeFileSync(filePath, JSON.stringify(this.collection, null, 2));
     }
@@ -264,7 +280,7 @@ export class DocumentCollectionManager {
      */
     addDocument(doc) {
         // Remove existing document with same ID
-        this.collection.documents = this.collection.documents.filter(d => d.metadata.id !== doc.metadata.id);
+        this.collection.documents = this.collection.documents.filter((d) => d.metadata.id !== doc.metadata.id);
         // Add new document
         this.collection.documents.push(doc);
         // Update index
@@ -278,14 +294,14 @@ export class DocumentCollectionManager {
     search(query, options) {
         const queryLower = query.toLowerCase();
         const queryTokens = queryLower.split(/\s+/);
-        let results = this.collection.documents.filter(doc => {
+        let results = this.collection.documents.filter((doc) => {
             // Type filter
             if (options?.type && doc.metadata.type !== options.type) {
                 return false;
             }
             // Tags filter
             if (options?.tags?.length) {
-                const hasTag = options.tags.some(tag => doc.metadata.tags.includes(tag));
+                const hasTag = options.tags.some((tag) => doc.metadata.tags.includes(tag));
                 if (!hasTag)
                     return false;
             }
@@ -296,9 +312,11 @@ export class DocumentCollectionManager {
                 ...doc.searchIndex.keywords,
                 ...doc.searchIndex.concepts,
                 ...doc.searchIndex.technologies,
-                ...doc.sections.map(s => s.heading + ' ' + s.content),
-            ].join(' ').toLowerCase();
-            return queryTokens.every(token => searchText.includes(token));
+                ...doc.sections.map((s) => s.heading + " " + s.content),
+            ]
+                .join(" ")
+                .toLowerCase();
+            return queryTokens.every((token) => searchText.includes(token));
         });
         // Sort by relevance (simple scoring)
         results.sort((a, b) => {
@@ -316,13 +334,13 @@ export class DocumentCollectionManager {
      * Get document by ID
      */
     getById(id) {
-        return this.collection.documents.find(d => d.metadata.id === id);
+        return this.collection.documents.find((d) => d.metadata.id === id);
     }
     /**
      * Get documents by type
      */
     getByType(type) {
-        return this.collection.documents.filter(d => d.metadata.type === type);
+        return this.collection.documents.filter((d) => d.metadata.type === type);
     }
     /**
      * Get related documents
@@ -332,29 +350,29 @@ export class DocumentCollectionManager {
         if (!doc)
             return [];
         // Find documents with overlapping keywords/technologies
-        const otherDocs = this.collection.documents.filter(d => d.metadata.id !== docId);
+        const otherDocs = this.collection.documents.filter((d) => d.metadata.id !== docId);
         return otherDocs
-            .map(d => ({
+            .map((d) => ({
             doc: d,
             score: this.calculateSimilarity(doc, d),
         }))
-            .filter(r => r.score > 0)
+            .filter((r) => r.score > 0)
             .sort((a, b) => b.score - a.score)
             .slice(0, limit)
-            .map(r => r.doc);
+            .map((r) => r.doc);
     }
     /**
      * Export collection for embedding generation
      */
     exportForEmbedding() {
-        return this.collection.documents.map(doc => ({
+        return this.collection.documents.map((doc) => ({
             id: doc.metadata.id,
             text: [
                 doc.metadata.title,
                 doc.summary,
-                ...doc.sections.map(s => `${s.heading}: ${s.content}`),
-                doc.searchIndex.keywords.join(', '),
-            ].join('\n\n'),
+                ...doc.sections.map((s) => `${s.heading}: ${s.content}`),
+                doc.searchIndex.keywords.join(", "),
+            ].join("\n\n"),
         }));
     }
     /**
@@ -372,19 +390,19 @@ export class DocumentCollectionManager {
                 score += 5;
             }
             // Keyword match
-            if (doc.searchIndex.keywords.some(k => k.includes(token))) {
+            if (doc.searchIndex.keywords.some((k) => k.includes(token))) {
                 score += 8;
             }
             // Technology match
-            if (doc.searchIndex.technologies.some(t => t.includes(token))) {
+            if (doc.searchIndex.technologies.some((t) => t.includes(token))) {
                 score += 6;
             }
             // Section heading match
-            if (doc.sections.some(s => s.heading.toLowerCase().includes(token))) {
+            if (doc.sections.some((s) => s.heading.toLowerCase().includes(token))) {
                 score += 4;
             }
             // Content match
-            if (doc.sections.some(s => s.content.toLowerCase().includes(token))) {
+            if (doc.sections.some((s) => s.content.toLowerCase().includes(token))) {
                 score += 2;
             }
         }
@@ -400,13 +418,13 @@ export class DocumentCollectionManager {
             score += 2;
         }
         // Overlapping tags
-        const commonTags = docA.metadata.tags.filter(t => docB.metadata.tags.includes(t));
+        const commonTags = docA.metadata.tags.filter((t) => docB.metadata.tags.includes(t));
         score += commonTags.length * 3;
         // Overlapping keywords
-        const commonKeywords = docA.searchIndex.keywords.filter(k => docB.searchIndex.keywords.includes(k));
+        const commonKeywords = docA.searchIndex.keywords.filter((k) => docB.searchIndex.keywords.includes(k));
         score += commonKeywords.length;
         // Overlapping technologies
-        const commonTech = docA.searchIndex.technologies.filter(t => docB.searchIndex.technologies.includes(t));
+        const commonTech = docA.searchIndex.technologies.filter((t) => docB.searchIndex.technologies.includes(t));
         score += commonTech.length * 2;
         return score;
     }
@@ -416,30 +434,27 @@ export class DocumentCollectionManager {
     updateIndex(doc) {
         // Index by type
         const typeKey = `type:${doc.metadata.type}`;
-        if (!this.collection.index[typeKey]) {
-            this.collection.index[typeKey] = [];
-        }
-        if (!this.collection.index[typeKey].includes(doc.metadata.id)) {
-            this.collection.index[typeKey].push(doc.metadata.id);
+        this.collection.index[typeKey] ??= [];
+        const typeArray = this.collection.index[typeKey];
+        if (!typeArray.includes(doc.metadata.id)) {
+            typeArray.push(doc.metadata.id);
         }
         // Index by tags
         for (const tag of doc.metadata.tags) {
             const tagKey = `tag:${tag}`;
-            if (!this.collection.index[tagKey]) {
-                this.collection.index[tagKey] = [];
-            }
-            if (!this.collection.index[tagKey].includes(doc.metadata.id)) {
-                this.collection.index[tagKey].push(doc.metadata.id);
+            this.collection.index[tagKey] ??= [];
+            const tagArray = this.collection.index[tagKey];
+            if (!tagArray.includes(doc.metadata.id)) {
+                tagArray.push(doc.metadata.id);
             }
         }
         // Index by technologies
         for (const tech of doc.searchIndex.technologies) {
             const techKey = `tech:${tech}`;
-            if (!this.collection.index[techKey]) {
-                this.collection.index[techKey] = [];
-            }
-            if (!this.collection.index[techKey].includes(doc.metadata.id)) {
-                this.collection.index[techKey].push(doc.metadata.id);
+            this.collection.index[techKey] ??= [];
+            const techArray = this.collection.index[techKey];
+            if (!techArray.includes(doc.metadata.id)) {
+                techArray.push(doc.metadata.id);
             }
         }
     }
